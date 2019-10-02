@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>640</width>
+    <width>800</width>
     <height>500</height>
    </rect>
   </property>
@@ -18,13 +18,13 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>640</width>
+    <width>800</width>
     <height>500</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>640</width>
+    <width>800</width>
     <height>500</height>
    </size>
   </property>
@@ -35,9 +35,9 @@
    <widget class="QLineEdit" name="lineEdit">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>20</y>
-      <width>151</width>
+      <x>250</x>
+      <y>10</y>
+      <width>171</width>
       <height>22</height>
      </rect>
     </property>
@@ -45,8 +45,8 @@
    <widget class="QPushButton" name="searchButton">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>20</y>
+      <x>430</x>
+      <y>10</y>
       <width>93</width>
       <height>28</height>
      </rect>
@@ -61,9 +61,9 @@
    <widget class="QProgressBar" name="progressBar">
     <property name="geometry">
      <rect>
-      <x>140</x>
+      <x>10</x>
       <y>420</y>
-      <width>251</width>
+      <width>781</width>
       <height>23</height>
      </rect>
     </property>
@@ -77,9 +77,9 @@
    <widget class="QTableWidget" name="tableWidget">
     <property name="geometry">
      <rect>
-      <x>140</x>
-      <y>50</y>
-      <width>251</width>
+      <x>250</x>
+      <y>40</y>
+      <width>271</width>
       <height>361</height>
      </rect>
     </property>
@@ -159,23 +159,13 @@
      </property>
     </column>
    </widget>
-   <widget class="QTextBrowser" name="textBrowser">
-    <property name="geometry">
-     <rect>
-      <x>400</x>
-      <y>50</y>
-      <width>211</width>
-      <height>191</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QToolBox" name="toolBox">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
-      <width>121</width>
-      <height>381</height>
+      <y>10</y>
+      <width>171</width>
+      <height>391</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -186,8 +176,8 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>121</width>
-       <height>319</height>
+       <width>171</width>
+       <height>329</height>
       </rect>
      </property>
      <attribute name="label">
@@ -198,7 +188,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>121</width>
+        <width>171</width>
         <height>321</height>
        </rect>
       </property>
@@ -209,13 +199,88 @@
       <rect>
        <x>0</x>
        <y>0</y>
-       <width>121</width>
-       <height>319</height>
+       <width>171</width>
+       <height>329</height>
       </rect>
      </property>
      <attribute name="label">
       <string>Page 2</string>
      </attribute>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>539</x>
+      <y>39</y>
+      <width>231</width>
+      <height>361</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Word tools</string>
+    </property>
+    <widget class="QTextBrowser" name="textBrowser">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>211</width>
+       <height>191</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>290</y>
+       <width>211</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>270</y>
+       <width>61</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Edit</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>55</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Context</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pushButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>320</y>
+       <width>93</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Update word</string>
+     </property>
     </widget>
    </widget>
   </widget>
@@ -224,7 +289,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>640</width>
+     <width>800</width>
      <height>26</height>
     </rect>
    </property>
@@ -233,6 +298,8 @@
      <string>File</string>
     </property>
     <addaction name="actionAdd_Corpus_Directory"/>
+    <addaction name="actionSave_Dictionary"/>
+    <addaction name="actionLoad_Dictionary"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -256,13 +323,23 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
    <addaction name="actionAdd_Corpus_Directory"/>
   </widget>
   <action name="actionAdd_Corpus_Directory">
    <property name="text">
-    <string>Add Corpus Directory</string>
+    <string>New dictionary from corpus</string>
+   </property>
+  </action>
+  <action name="actionSave_Dictionary">
+   <property name="text">
+    <string>Save dictionary</string>
+   </property>
+  </action>
+  <action name="actionLoad_Dictionary">
+   <property name="text">
+    <string>Load dictionary</string>
    </property>
   </action>
  </widget>

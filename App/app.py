@@ -1,59 +1,17 @@
 import os
-import re
 import numpy as np
 import nltk
 from nltk.corpus.reader.plaintext import *
-from nltk.tokenize import *
-from nltk import FreqDist
 import sys
-import time
-from PyQt5 import QtGui, uic, QtCore
+from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
+
+from Corpus import *
 
 qtCreatorFile = "app_window.ui"
 
 Ui_MainWindow, QtBaseClass = uic.loadUiType(qtCreatorFile)
-
-
-class Corpus:
-    def __init__(self, raw_text, freq_dict):
-        self.raw_text = raw_text
-        self.freq_dict = freq_dict
-
-    def merge(self, corpus):
-        new_dict = self.freq_dict.copy()
-        for key in list(corpus.freq_dict.keys()):
-            new_dict[key] = new_dict.get(key, 0) + corpus.freq_dict[key]
-
-        new_text = self.raw_text + '\n\n**\n\n' + corpus.raw_text
-
-        return Corpus(new_text, new_dict)
-
-    def get_words(self):
-        return list(self.freq_dict.keys())
-
-    def find_word_context(self, word):
-        i = self.raw_text.find(word)
-        context = self.raw_text[max(0, i-100):i+100]
-        return "..."+context+"..."
-
-    def replace_word(self, old, new):
-        l = len(old)
-        print(len(self.raw_text))
-        starts = [m.start() for m in re.finditer('(^|[^\w\-\'])('+old+')([^\w\-\']|$)', self.raw_text)]
-        new_text = ''
-        prev_end = 0
-        for start in starts:
-            new_text += self.raw_text[prev_end:start] + new
-            prev_end = start+l
-        new_text += self.raw_text[prev_end:]
-        self.raw_text = new_text
-
-        cnt = self.freq_dict.pop(old)
-        new_words = new.split()
-        for w in new_words:
-            self.freq_dict[w] = self.freq_dict.get(w, 0) + cnt
 
 
 class CorpusLoadTask(QThread):
@@ -63,24 +21,14 @@ class CorpusLoadTask(QThread):
     def __init__(self, corpus_dir):
         super(CorpusLoadTask, self).__init__()
         self.corpus_dir = corpus_dir
-        self.corpus = None
-        self.raw_text = ''
-        self.freq_dict = {}
-
-    def get_corpus(self):
-        return Corpus(self.raw_text, self.freq_dict)
+        self.corpus = Corpus()
 
     def run(self):
         self.busy_sig.emit(True)
-        self.corpus = PlaintextCorpusReader(self.corpus_dir, '.*')
-        self.raw_text = self.corpus.raw().replace("''", '"').lower()
-        tokenizer = TreebankWordTokenizer()
-        spans = list(tokenizer.span_tokenize(self.raw_text))
+        corpus_reader = PlaintextCorpusReader(self.corpus_dir, '.*')
+        raw_text = corpus_reader.raw()
+        self.corpus.add_text(raw_text)
 
-        reg = "[A-Za-z]+([\'|\-][A-Za-z]+)*"
-        words_ids = [(self.raw_text[s:t], s) for s, t in spans if re.fullmatch(reg, self.raw_text[s:t]) is not None]
-        words = [word_id[0] for word_id in words_ids]
-        self.freq_dict = FreqDist(words)
         self.busy_sig.emit(False)
         self.done.emit()
 
@@ -97,10 +45,10 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.lineEdit.returnPressed.connect(self.search)
         self.lineEdit_2.returnPressed.connect(self.edit_word)
         self.tableWidget.itemActivated.connect(self.on_item_select)
-        self.corpus = Corpus('', {})
+        self.corpus = Corpus()
 
     def on_corpus_loaded(self):
-        self.corpus = self.corpus.merge(self.corpus_load_task.get_corpus())
+        self.corpus = self.corpus_load_task.corpus
         self.load_words(self.corpus.get_words())
 
     def switch_progress_range(self, is_busy):
@@ -146,6 +94,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         new = self.lineEdit_2.text()
         self.corpus.replace_word(self.ed_word, new)
         self.load_words(self.corpus.get_words())
+        self.textBrowser.setText('')
         self.lineEdit_2.setText('')
         self.lineEdit_2.setReadOnly(True)
 

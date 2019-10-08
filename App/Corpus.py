@@ -1,6 +1,13 @@
 import numpy as np
 import re
+import nltk
 from nltk.tokenize import *
+
+
+def preprocess_text(text):
+    text = text.replace("''", '"')
+    text = text.replace("’", "'")
+    return text
 
 
 class Corpus:
@@ -10,13 +17,8 @@ class Corpus:
         self.raw_text = raw_text
         self.freq_dict = freq_dict
 
-    def preprocess_text(self, text):
-        text = text.replace("''", '"')
-        text = text.replace("’", "'")
-        return text
-
     def add_text(self, text):
-        text = self.preprocess_text(text)
+        text = preprocess_text(text)
 
         print('add_text')
         self.raw_text += '\n\n**\n\n' + text
@@ -69,3 +71,7 @@ class Corpus:
         for w in new_words:
             if re.fullmatch(reg, w) is not None:
                 self.add_word(w)
+
+    def get_tag(self, word):
+        _, tag = nltk.pos_tag([word])[0]
+        return tag

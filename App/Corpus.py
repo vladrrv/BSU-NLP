@@ -2,6 +2,7 @@ import numpy as np
 import re
 import nltk
 from nltk.tokenize import *
+nltk.download('averaged_perceptron_tagger')
 
 
 def preprocess_text(text):
@@ -20,19 +21,17 @@ class Corpus:
     def add_text(self, text):
         text = preprocess_text(text)
 
-        print('add_text')
         self.raw_text += '\n\n**\n\n' + text
         tokenizer = TreebankWordTokenizer()
         spans = list(tokenizer.span_tokenize(text))
 
         words_ids = [(text[s:t], s) for s, t in spans if re.fullmatch(self.reg, text[s:t]) is not None]
-        print('add_text words_ids')
+
         words = [word_id[0] for word_id in words_ids]
         words.sort(reverse=True)
-        print('add_text sort')
+
         for word in words:
             self.add_word(word)
-        print('add_text end')
 
     def get_words(self):
         return list(self.freq_dict.keys())
@@ -46,13 +45,15 @@ class Corpus:
     def add_word(self, word):
         if word[0].isupper():
             lower_word = word.lower()
-            lower_val = self.freq_dict.get(lower_word, 0)
+            lower_val = self.freq_dict.get(lower_word, [0, None])[0]
             if lower_val > 0:
-                self.freq_dict[lower_word] += 1
-            else:
-                self.freq_dict[word] = self.freq_dict.get(word, 0) + 1
+                self.freq_dict[lower_word][0] += 1
+                return
+        val = self.freq_dict.get(word, [0, None])[0]
+        if val > 0:
+            self.freq_dict[word][0] += 1
         else:
-            self.freq_dict[word] = self.freq_dict.get(word, 0) + 1
+            self.freq_dict[word] = [1, [self.make_tag(word)]]
 
     def replace_word(self, old, new):
         l = len(old)
@@ -72,6 +73,18 @@ class Corpus:
             if re.fullmatch(reg, w) is not None:
                 self.add_word(w)
 
-    def get_tag(self, word):
-        _, tag = nltk.pos_tag([word])[0]
+    def make_tag(self, word):
+        tag = ''
+        try:
+            #print(nltk.pos_tag([word]))
+            _, tag = nltk.pos_tag([word])[0]
+        except Exception as e:
+            print(e)
+
         return tag
+
+    def get_freq(self, word):
+        return self.freq_dict.get(word, (0, []))[0]
+
+    def get_tag(self, word):
+        return self.freq_dict.get(word, (0, []))[1][0]

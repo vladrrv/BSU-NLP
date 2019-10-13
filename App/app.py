@@ -42,6 +42,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.actionSave_Dictionary.triggered.connect(self.save_corpus)
         self.actionLoad_Dictionary.triggered.connect(self.load_corpus)
         self.searchButton.clicked.connect(self.search)
+        self.editButton.clicked.connect(self.edit_word)
         self.lineEdit.returnPressed.connect(self.search)
         self.lineEdit_2.returnPressed.connect(self.edit_word)
         self.tableWidget.itemActivated.connect(self.on_item_select)
@@ -106,11 +107,13 @@ class MyApp(QMainWindow, Ui_MainWindow):
             current_row_count = self.tableWidget.rowCount()
             self.tableWidget.insertRow(current_row_count)
             item = QTableWidgetItem(word)
-
             self.tableWidget.setItem(current_row_count, 0, item)
             item = QTableWidgetItem()
-            item.setData(Qt.DisplayRole, self.corpus.freq_dict[word])
+            item.setData(Qt.DisplayRole, self.corpus.get_freq(word))
             self.tableWidget.setItem(current_row_count, 1, item)
+            item = QTableWidgetItem()
+            item.setData(Qt.DisplayRole, self.corpus.get_tag(word))
+            self.tableWidget.setItem(current_row_count, 2, item)
         self.tableWidget.setSortingEnabled(True)
 
     def save_corpus(self):
@@ -130,7 +133,10 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
 
 if __name__ == "__main__":
-    app = QApplication(sys.argv)
-    window = MyApp()
-    window.show()
-    sys.exit(app.exec_())
+    try:
+        app = QApplication(sys.argv)
+        window = MyApp()
+        window.show()
+        sys.exit(app.exec_())
+    except Exception as e:
+        print(e)

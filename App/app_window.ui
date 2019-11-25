@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>500</height>
+    <width>600</width>
+    <height>560</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,52 +18,26 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>800</width>
-    <height>500</height>
+    <width>600</width>
+    <height>560</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>800</width>
-    <height>500</height>
+    <width>600</width>
+    <height>560</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Smart Dictionary</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QLineEdit" name="le_search">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>171</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="searchButton">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>10</y>
-      <width>93</width>
-      <height>28</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Search</string>
-    </property>
-    <property name="default">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QProgressBar" name="progressBar">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>420</y>
-      <width>781</width>
+      <y>460</y>
+      <width>581</width>
       <height>23</height>
      </rect>
     </property>
@@ -74,238 +48,311 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QTableWidget" name="tableWidget">
+   <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>40</y>
-      <width>271</width>
-      <height>361</height>
-     </rect>
-    </property>
-    <property name="editTriggers">
-     <set>QAbstractItemView::NoEditTriggers</set>
-    </property>
-    <property name="selectionMode">
-     <enum>QAbstractItemView::SingleSelection</enum>
-    </property>
-    <property name="selectionBehavior">
-     <enum>QAbstractItemView::SelectRows</enum>
-    </property>
-    <property name="verticalScrollMode">
-     <enum>QAbstractItemView::ScrollPerPixel</enum>
-    </property>
-    <property name="horizontalScrollMode">
-     <enum>QAbstractItemView::ScrollPerPixel</enum>
-    </property>
-    <property name="sortingEnabled">
-     <bool>true</bool>
-    </property>
-    <attribute name="horizontalHeaderDefaultSectionSize">
-     <number>110</number>
-    </attribute>
-    <attribute name="horizontalHeaderMinimumSectionSize">
-     <number>40</number>
-    </attribute>
-    <attribute name="verticalHeaderVisible">
-     <bool>false</bool>
-    </attribute>
-    <attribute name="verticalHeaderDefaultSectionSize">
-     <number>16</number>
-    </attribute>
-    <attribute name="verticalHeaderMinimumSectionSize">
-     <number>16</number>
-    </attribute>
-    <column>
-     <property name="text">
-      <string>Word</string>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="textAlignment">
-      <set>AlignLeading|AlignVCenter</set>
-     </property>
-     <property name="background">
-      <color alpha="20">
-       <red>0</red>
-       <green>0</green>
-       <blue>0</blue>
-      </color>
-     </property>
-    </column>
-    <column>
-     <property name="text">
-      <string>Frequency</string>
-     </property>
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="textAlignment">
-      <set>AlignLeading|AlignVCenter</set>
-     </property>
-     <property name="background">
-      <color alpha="20">
-       <red>0</red>
-       <green>0</green>
-       <blue>0</blue>
-      </color>
-     </property>
-    </column>
-   </widget>
-   <widget class="QGroupBox" name="groupBox">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
       <y>10</y>
-      <width>251</width>
-      <height>391</height>
+      <width>581</width>
+      <height>441</height>
      </rect>
     </property>
-    <property name="title">
-     <string>Word tools</string>
+    <property name="currentIndex">
+     <number>0</number>
     </property>
-    <property name="alignment">
-     <set>Qt::AlignCenter</set>
-    </property>
-    <widget class="QTextBrowser" name="tb_context">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>40</y>
-       <width>231</width>
-       <height>171</height>
-      </rect>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="le_editword">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>220</y>
-       <width>141</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>55</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Context</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="editButton">
-     <property name="geometry">
-      <rect>
-       <x>160</x>
-       <y>220</y>
-       <width>81</width>
-       <height>28</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Edit word</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>260</y>
-       <width>31</width>
-       <height>16</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Tags</string>
-     </property>
-    </widget>
-    <widget class="QWidget" name="horizontalLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>280</y>
-       <width>131</width>
-       <height>91</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>4</number>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Dictionary</string>
+     </attribute>
+     <widget class="QTableWidget" name="tw_wordfreq">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>271</width>
+        <height>361</height>
+       </rect>
       </property>
-      <item>
-       <widget class="QListWidget" name="lw_tags"/>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <property name="spacing">
-         <number>4</number>
-        </property>
-        <item>
-         <widget class="QComboBox" name="cb_tags"/>
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <property name="verticalScrollMode">
+       <enum>QAbstractItemView::ScrollPerPixel</enum>
+      </property>
+      <property name="horizontalScrollMode">
+       <enum>QAbstractItemView::ScrollPerPixel</enum>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>110</number>
+      </attribute>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>40</number>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderDefaultSectionSize">
+       <number>16</number>
+      </attribute>
+      <attribute name="verticalHeaderMinimumSectionSize">
+       <number>16</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Word</string>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="background">
+        <color alpha="20">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Frequency</string>
+       </property>
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="textAlignment">
+        <set>AlignLeading|AlignVCenter</set>
+       </property>
+       <property name="background">
+        <color alpha="20">
+         <red>0</red>
+         <green>0</green>
+         <blue>0</blue>
+        </color>
+       </property>
+      </column>
+     </widget>
+     <widget class="QPushButton" name="pb_search">
+      <property name="geometry">
+       <rect>
+        <x>202</x>
+        <y>10</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Search</string>
+      </property>
+      <property name="default">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="le_search">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>191</width>
+        <height>21</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>10</y>
+        <width>281</width>
+        <height>391</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Word tools</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <widget class="QTextBrowser" name="tb_context">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>261</width>
+         <height>171</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="le_editword">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>220</y>
+         <width>181</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_context">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>55</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Context</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pb_edit">
+       <property name="geometry">
+        <rect>
+         <x>200</x>
+         <y>220</y>
+         <width>71</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Edit word</string>
+       </property>
+      </widget>
+      <widget class="QWidget" name="gridLayoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>260</y>
+         <width>262</width>
+         <height>120</height>
+        </rect>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="1">
+         <widget class="QListWidget" name="lw_tags"/>
         </item>
-        <item>
-         <widget class="QPushButton" name="pb_addtag">
+        <item row="0" column="2">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <property name="spacing">
+           <number>4</number>
+          </property>
+          <item>
+           <widget class="QComboBox" name="cb_tags"/>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pb_addtag">
+            <property name="text">
+             <string>Add</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pb_removetag">
+            <property name="text">
+             <string>Remove</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_tags">
           <property name="text">
-           <string>Add</string>
+           <string>Tags</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QPushButton" name="pb_removetag">
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_init">
           <property name="text">
-           <string>Remove</string>
+           <string>Initial form</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="le_initform">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
        </layout>
-      </item>
-     </layout>
+      </widget>
+     </widget>
     </widget>
-    <widget class="QWidget" name="verticalLayoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>150</x>
-       <y>280</y>
-       <width>81</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Initial form</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="le_initform">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
+    <widget class="QWidget" name="tab_2">
+     <attribute name="title">
+      <string>Annotated Text</string>
+     </attribute>
+     <widget class="QTextBrowser" name="tb_annotated">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>551</width>
+        <height>391</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_3">
+     <attribute name="title">
+      <string>Stats</string>
+     </attribute>
+     <widget class="QTableWidget" name="tw_stat_t">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>181</width>
+        <height>261</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="tw_stat_tw">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>10</y>
+        <width>181</width>
+        <height>261</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="tw_stat_tt">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>10</y>
+        <width>181</width>
+        <height>261</height>
+       </rect>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
@@ -314,7 +361,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>600</width>
      <height>26</height>
     </rect>
    </property>
@@ -322,14 +369,16 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionAdd_Corpus_Directory"/>
-    <addaction name="actionSave_Dictionary"/>
-    <addaction name="actionLoad_Dictionary"/>
+    <addaction name="action_add"/>
+    <addaction name="action_save"/>
+    <addaction name="action_load"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>Text</string>
     </property>
+    <addaction name="action_annotate"/>
+    <addaction name="action_collect"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -351,29 +400,70 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionAdd_Corpus_Directory"/>
+   <addaction name="action_add"/>
+   <addaction name="action_load"/>
+   <addaction name="action_save"/>
+   <addaction name="action_annotate"/>
+   <addaction name="action_collect"/>
+   <addaction name="action_td"/>
   </widget>
-  <action name="actionAdd_Corpus_Directory">
+  <action name="action_add">
+   <property name="icon">
+    <iconset resource="App.qrc">
+     <normaloff>:/icon/24x24/2.png</normaloff>:/icon/24x24/2.png</iconset>
+   </property>
    <property name="text">
-    <string>New corpus</string>
+    <string>Add texts</string>
    </property>
   </action>
-  <action name="actionSave_Dictionary">
+  <action name="action_save">
+   <property name="icon">
+    <iconset resource="App.qrc">
+     <normaloff>:/icon/24x24/22.png</normaloff>:/icon/24x24/22.png</iconset>
+   </property>
    <property name="text">
-    <string>Save dictionary</string>
+    <string>Save corpus</string>
    </property>
   </action>
-  <action name="actionLoad_Dictionary">
+  <action name="action_load">
+   <property name="icon">
+    <iconset resource="App.qrc">
+     <normaloff>:/icon/24x24/52.png</normaloff>:/icon/24x24/52.png</iconset>
+   </property>
    <property name="text">
-    <string>Load dictionary</string>
+    <string>Load corpus</string>
    </property>
   </action>
   <action name="action_td">
+   <property name="icon">
+    <iconset resource="App.qrc">
+     <normaloff>:/icon/24x24/3.png</normaloff>:/icon/24x24/3.png</iconset>
+   </property>
    <property name="text">
-    <string>Tags Definitions</string>
+    <string>Tags definitions</string>
+   </property>
+  </action>
+  <action name="action_collect">
+   <property name="icon">
+    <iconset resource="App.qrc">
+     <normaloff>:/icon/24x24/11.png</normaloff>:/icon/24x24/11.png</iconset>
+   </property>
+   <property name="text">
+    <string>Collect stats</string>
+   </property>
+  </action>
+  <action name="action_annotate">
+   <property name="icon">
+    <iconset resource="App.qrc">
+     <normaloff>:/icon/24x24/96.png</normaloff>:/icon/24x24/96.png</iconset>
+   </property>
+   <property name="text">
+    <string>Annotate</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="App.qrc"/>
+ </resources>
  <connections/>
 </ui>

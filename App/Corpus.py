@@ -69,61 +69,98 @@ def preprocess_text(text):
     return text
 
 
+class Entry:
+    def __init__(self, corpus, word, tags=()):
+        self.word = word
+        self.init_forms = {tag : corpus.get_init_form(word, tag) for tag in tags}
+
+    def __hash__(self):
+        return hash(self.word)
+
+    def get_init_for_tag(self, tag):
+        return self.init_forms.get(tag, None)
+
+    def __str__(self):
+        return self.word
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class Corpus:
     reg = r'[A-Za-z]+([\'|\-][A-Za-z]+)*'
+    sep = '\n\n**\n\n'
 
-    def __init__(self, raw_text='', freq_dict={}):
-        self.raw_text = raw_text
-        self.freq_dict = freq_dict
+    def __init__(self):
+        self.raw_text = ''
+        self.tokenized_text = []
+        self.freq_tag_dict = {}
+        self.tokenizer = TreebankWordTokenizer()
 
     def add_text(self, text):
         try:
             text = preprocess_text(text)
+            prev_len = len(self.raw_text)+len(self.sep)
+            self.raw_text += self.sep + text
+            spans = list(self.tokenizer.span_tokenize(text))
+            spans_starts = [s+prev_len for s, t in spans]
+            tokens = [text[s:t] for s, t in spans]
+            print('making pos tags')
+            tokens_tags = nltk.pos_tag(tokens)
+            spans_tokens_tags = [(spans_starts[i], *tokens_tags[i]) for i in range(len(spans_starts))]
+            self.tokenized_text += spans_tokens_tags
+            print('done')
 
-            self.raw_text += '\n\n**\n\n' + text
-            tokenizer = TreebankWordTokenizer()
-            spans = list(tokenizer.span_tokenize(text))
+            words_tags = [(word, tag) for word, tag in tokens_tags if tag in POS_TAGS and re.fullmatch(self.reg, word)]
 
-            words_ids = [(text[s:t], s) for s, t in spans if re.fullmatch(self.reg, text[s:t]) is not None]
-
-            words = [word_id[0] for word_id in words_ids]
-            words.sort(reverse=True)
-            for word in words:
-                self.add_word(word)
+            words_tags.sort(reverse=True, key=lambda wt: wt[0])
+            for word, tag in words_tags:
+                self.add_word(word, tag)
         except Exception as e:
             print(e)
 
     def get_words(self):
-        return list(self.freq_dict.keys())
+        words = list(self.freq_tag_dict.keys())
+        words.sort(key=lambda w: w.lower())
+        return words
 
     def find_word_context(self, word):
-        starts = [m.start() for m in re.finditer('(^|[^\w\-\'])(' + word + ')([^\w\-\']|$)', self.raw_text)]
+        starts = [m.start() for m in re.finditer(rf'(^|[^\w\-\'])({word})([^\w\-\']|$)', self.raw_text)]
         i = starts[0]
         context = self.raw_text[max(0, i - 100):i + 100]
         return "..." + context + "..."
 
-    def add_word(self, word):
+    def add_word(self, word, tag):
         if word[0].isupper():
             lower_word = word.lower()
-            lower_val = self.freq_dict.get(lower_word, [0, None])[0]
+            lower_val = self.freq_tag_dict.get(lower_word, [0, None])[0]
             if lower_val > 0:
-                self.freq_dict[lower_word][0] += 1
+                self.freq_tag_dict[lower_word][0] += 1
+                if self.freq_tag_dict[lower_word][1].get(tag) is None:
+                    init = self.get_init_form(lower_word, tag)
+                    self.freq_tag_dict[lower_word][1][tag] = init
                 return
-        val = self.freq_dict.get(word, [0, None])[0]
+        val = self.freq_tag_dict.get(word, [0, None])[0]
         if val > 0:
-            self.freq_dict[word][0] += 1
+            self.freq_tag_dict[word][0] += 1
+            if self.freq_tag_dict[word][1].get(tag) is None:
+                init = self.get_init_form(word, tag)
+                self.freq_tag_dict[word][1][tag] = init
         else:
-            self.freq_dict[word] = [1, {self.make_tag(word)}]
+            init = self.get_init_form(word, tag)
+            self.freq_tag_dict[word] = [1, {tag: init}]
 
     def add_tag(self, word, tag):
-        self.freq_dict[word][1].add(tag)
+        if self.freq_tag_dict[word][1].get(tag) is None:
+            init = self.get_init_form(word, tag)
+            self.freq_tag_dict[word][1][tag] = init
 
     def remove_tag(self, word, tag):
-        self.freq_dict[word][1].remove(tag)
+        del self.freq_tag_dict[word][1][tag]
 
     def replace_word(self, old, new):
         l = len(old)
-        starts = [m.start() for m in re.finditer('(^|[^\w\-\'])(' + old + ')([^\w\-\']|$)', self.raw_text)]
+        starts = [m.start() for m in re.finditer(rf'(^|[^\w\-\'])({old})([^\w\-\']|$)', self.raw_text)]
         new_text = ''
         prev_end = 0
         for start in starts:
@@ -132,13 +169,60 @@ class Corpus:
         new_text += self.raw_text[prev_end:]
         self.raw_text = new_text
 
-        cnt = self.freq_dict.pop(old)
+        cnt = self.freq_tag_dict.pop(old)
         new_words = new.split()
         for w in new_words:
             if re.fullmatch(self.reg, w) is not None:
-                self.add_word(w)
+                tag = self.make_tag(w)
+                self.add_word(w, tag)
 
-    def make_tag(self, word):
+    def collect_stats(self):
+        tag_freq = {tag:0 for tag in POS_TAGS}
+        word_tag_freq = {}
+        tag_tag_freq = {}
+        prev_wt = None
+        for s, w, t in self.tokenized_text:
+            if t not in POS_TAGS or re.fullmatch(self.reg, w) is None:
+                continue
+            tag_freq[t] += 1
+            wt = (w.lower(), t)
+            if word_tag_freq.get(wt):
+                word_tag_freq[wt] += 1
+            else:
+                word_tag_freq[wt] = 1
+            if not prev_wt:
+                prev_wt = wt
+            else:
+                tag_pair = (prev_wt[1], t)
+                if tag_tag_freq.get(tag_pair):
+                    tag_tag_freq[tag_pair] += 1
+                else:
+                    tag_tag_freq[tag_pair] = 1
+
+        return tag_freq, word_tag_freq, tag_tag_freq
+
+    def get_annotated_text(self):
+        annotated_text = []
+        prev_e = None
+        for s, w, t in self.tokenized_text:
+            e = s+len(w)
+            if prev_e:
+                annotated_text.append(self.raw_text[prev_e:s])
+            annotated_text.append(self.raw_text[s:e])
+            if t in POS_TAGS and re.fullmatch(self.reg, w):
+                annotated_text.append('_')
+                annotated_text.append(t)
+            prev_e = e
+        return ''.join(annotated_text)
+
+    def get_freq(self, word):
+        return self.freq_tag_dict.get(word, (0, {}))[0]
+
+    def get_tags(self, word):
+        return self.freq_tag_dict.get(word, (0, {}))[1].keys()
+
+    @staticmethod
+    def make_tag(word):
         tag = ''
         try:
             _, tag = nltk.pos_tag([word])[0]
@@ -146,13 +230,9 @@ class Corpus:
             print(e)
         return tag
 
-    def get_freq(self, word):
-        return self.freq_dict.get(word, (0, []))[0]
-
-    def get_tags(self, word):
-        return self.freq_dict.get(word, (0, []))[1]
-
     def get_init_form(self, word, tag):
+        if self.freq_tag_dict.get(word) is not None and self.freq_tag_dict[word][1].get(tag) is not None:
+            return self.freq_tag_dict[word][1][tag]
         lemma = word
         try:
             lemmatizer = WordNetLemmatizer()

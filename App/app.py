@@ -39,17 +39,19 @@ class MyApp(QMainWindow, Ui_MainWindow):
         QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
-        self.actionAdd_Corpus_Directory.triggered.connect(self.open_dir)
-        self.actionSave_Dictionary.triggered.connect(self.save_corpus)
-        self.actionLoad_Dictionary.triggered.connect(self.load_corpus)
+        self.action_add.triggered.connect(self.open_dir)
+        self.action_save.triggered.connect(self.save_corpus)
+        self.action_load.triggered.connect(self.load_corpus)
         self.action_td.triggered.connect(self.show_td)
-        self.searchButton.clicked.connect(self.search)
-        self.editButton.clicked.connect(self.edit_word)
+        self.action_collect.triggered.connect(self.collect_stats)
+        self.action_annotate.triggered.connect(self.annotate)
+        self.pb_search.clicked.connect(self.search)
+        self.pb_edit.clicked.connect(self.edit_word)
         self.le_search.returnPressed.connect(self.search)
         self.le_editword.returnPressed.connect(self.edit_word)
-        self.tableWidget.itemActivated.connect(self.on_word_select)
+        self.tw_wordfreq.itemClicked.connect(self.on_word_select)
 
-        self.lw_tags.itemActivated.connect(self.on_tag_select)
+        self.lw_tags.itemClicked.connect(self.on_tag_select)
         self.pb_addtag.clicked.connect(self.add_tag)
         self.pb_removetag.clicked.connect(self.remove_tag)
 
@@ -67,12 +69,13 @@ class MyApp(QMainWindow, Ui_MainWindow):
             self.progressBar.setRange(0, 100)
             print('free')
 
-    def init_corpus_load_task(self, corpus_dir):
+    def run_corpus_load_task(self, corpus_dir):
         corpus_load_task = CorpusLoadTask(corpus_dir)
 
         def on_corpus_loaded():
             self.corpus = corpus_load_task.corpus
             self.load_words(self.corpus.get_words())
+            self.annotate()
 
         corpus_load_task.done.connect(on_corpus_loaded)
         corpus_load_task.busy_sig.connect(self.switch_progress_range)
@@ -82,7 +85,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         corpus_dir = QFileDialog.getExistingDirectory(self, "Select Directory")
         if corpus_dir is None or corpus_dir == '':
             return
-        self.init_corpus_load_task(corpus_dir)
+        self.run_corpus_load_task(corpus_dir)
 
     def show_td(self):
         TagsDescriptionDialog(self).exec_()
@@ -97,21 +100,21 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.load_words(found)
 
     def on_word_select(self, item):
-        if item.column() == 0:
-            word = item.text()
-            print(word)
-            context = self.corpus.find_word_context(word)
-            self.tb_context.setText(context)
-            self.le_editword.setText(word)
-            self.le_editword.setReadOnly(False)
-            self.ed_word = word
-            tags = self.corpus.get_tags(word)
-            self.load_tags(tags)
+        self.le_initform.setText('')
+        if item.column() != 0:
+            item = self.tw_wordfreq.item(item.row(), 0)
+        word = item.text()
+        context = self.corpus.find_word_context(word)
+        self.tb_context.setText(context)
+        self.le_editword.setText(word)
+        self.le_editword.setReadOnly(False)
+        self.ed_word = word
+        tags = self.corpus.get_tags(word)
+        self.load_tags(tags)
 
     def on_tag_select(self, item):
         self.ed_tag = item.text()
         self.le_initform.setText(self.corpus.get_init_form(self.ed_word, self.ed_tag))
-        print(self.ed_tag)
 
     def edit_word(self):
         new = self.le_editword.text()
@@ -136,19 +139,27 @@ class MyApp(QMainWindow, Ui_MainWindow):
             self.corpus.remove_tag(word, tag)
             self.load_tags(self.corpus.get_tags(word))
 
+    def collect_stats(self):
+        tag_freq, word_tag_freq, tag_tag_freq = self.corpus.collect_stats()
+        print(tag_freq)
+
+    def annotate(self):
+        annotated_text = self.corpus.get_annotated_text()
+        self.tb_annotated.setText(annotated_text)
+
     def load_words(self, word_list):
-        self.tableWidget.setSortingEnabled(False)
-        self.tableWidget.clear()
-        self.tableWidget.setHorizontalHeaderLabels(['Word','Frequency'])
+        self.tw_wordfreq.setSortingEnabled(False)
+        self.tw_wordfreq.setRowCount(0)
+        self.tw_wordfreq.setHorizontalHeaderLabels(['Word', 'Frequency'])
         for word in word_list:
-            current_row_count = self.tableWidget.rowCount()
-            self.tableWidget.insertRow(current_row_count)
+            current_row_count = self.tw_wordfreq.rowCount()
+            self.tw_wordfreq.insertRow(current_row_count)
             item = QTableWidgetItem(word)
-            self.tableWidget.setItem(current_row_count, 0, item)
+            self.tw_wordfreq.setItem(current_row_count, 0, item)
             item = QTableWidgetItem()
             item.setData(Qt.DisplayRole, self.corpus.get_freq(word))
-            self.tableWidget.setItem(current_row_count, 1, item)
-        self.tableWidget.setSortingEnabled(True)
+            self.tw_wordfreq.setItem(current_row_count, 1, item)
+        self.tw_wordfreq.setSortingEnabled(True)
 
     def load_tags(self, tags):
         self.lw_tags.clear()

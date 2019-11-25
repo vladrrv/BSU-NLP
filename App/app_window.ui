@@ -58,7 +58,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -329,19 +329,60 @@
         <x>10</x>
         <y>10</y>
         <width>181</width>
-        <height>261</height>
+        <height>391</height>
        </rect>
       </property>
+      <property name="verticalScrollMode">
+       <enum>QAbstractItemView::ScrollPerPixel</enum>
+      </property>
+      <property name="horizontalScrollMode">
+       <enum>QAbstractItemView::ScrollPerPixel</enum>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>80</number>
+      </attribute>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>80</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Tag</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Frequency</string>
+       </property>
+      </column>
      </widget>
-     <widget class="QTableWidget" name="tw_stat_tw">
+     <widget class="QTableWidget" name="tw_stat_wt">
       <property name="geometry">
        <rect>
         <x>200</x>
         <y>10</y>
         <width>181</width>
-        <height>261</height>
+        <height>391</height>
        </rect>
       </property>
+      <property name="verticalScrollMode">
+       <enum>QAbstractItemView::ScrollPerPixel</enum>
+      </property>
+      <property name="horizontalScrollMode">
+       <enum>QAbstractItemView::ScrollPerPixel</enum>
+      </property>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>100</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Word, tag</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Frequency</string>
+       </property>
+      </column>
      </widget>
      <widget class="QTableWidget" name="tw_stat_tt">
       <property name="geometry">
@@ -349,9 +390,31 @@
         <x>390</x>
         <y>10</y>
         <width>181</width>
-        <height>261</height>
+        <height>391</height>
        </rect>
       </property>
+      <property name="verticalScrollMode">
+       <enum>QAbstractItemView::ScrollPerPixel</enum>
+      </property>
+      <property name="horizontalScrollMode">
+       <enum>QAbstractItemView::ScrollPerPixel</enum>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>100</number>
+      </attribute>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>100</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Tag1, tag2</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Frequency</string>
+       </property>
+      </column>
      </widget>
     </widget>
    </widget>

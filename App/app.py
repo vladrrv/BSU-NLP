@@ -141,11 +141,39 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
     def collect_stats(self):
         tag_freq, word_tag_freq, tag_tag_freq = self.corpus.collect_stats()
-        print(tag_freq)
+        try:
+            self.load_stats(self.tw_stat_t, tag_freq)
+            self.load_stats(self.tw_stat_wt, word_tag_freq)
+            self.load_stats(self.tw_stat_tt, tag_tag_freq)
+        except Exception as e:
+            print(e)
 
     def annotate(self):
         annotated_text = self.corpus.get_annotated_text()
         self.tb_annotated.setText(annotated_text)
+
+    def load_stats(self, tw, stats):
+        if tw == self.tw_stat_t:
+            labels = ['Tag', 'Frequency']
+        elif tw == self.tw_stat_wt:
+            labels = ['Word, tag', 'Frequency']
+        elif tw == self.tw_stat_tt:
+            labels = ['Tag1, tag2', 'Frequency']
+        else:
+            labels = []
+        tw.setSortingEnabled(False)
+        tw.setRowCount(0)
+        tw.setHorizontalHeaderLabels(labels)
+        for key, value in stats.items():
+            current_row_count = tw.rowCount()
+            tw.insertRow(current_row_count)
+            item = QTableWidgetItem()
+            item.setData(Qt.DisplayRole, str(key))
+            tw.setItem(current_row_count, 0, item)
+            item = QTableWidgetItem()
+            item.setData(Qt.DisplayRole, value)
+            tw.setItem(current_row_count, 1, item)
+        tw.setSortingEnabled(True)
 
     def load_words(self, word_list):
         self.tw_wordfreq.setSortingEnabled(False)

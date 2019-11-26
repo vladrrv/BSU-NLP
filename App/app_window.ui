@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>560</height>
+    <height>540</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,13 +19,13 @@
   <property name="minimumSize">
    <size>
     <width>600</width>
-    <height>560</height>
+    <height>540</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>600</width>
-    <height>560</height>
+    <height>540</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -36,7 +36,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>460</y>
+      <y>450</y>
       <width>581</width>
       <height>23</height>
      </rect>
@@ -54,11 +54,11 @@
       <x>10</x>
       <y>10</y>
       <width>581</width>
-      <height>441</height>
+      <height>431</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -425,15 +425,23 @@
       <property name="horizontalScrollMode">
        <enum>QAbstractItemView::ScrollPerPixel</enum>
       </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>70</number>
+      </attribute>
       <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>100</number>
+       <number>50</number>
       </attribute>
       <attribute name="verticalHeaderVisible">
        <bool>false</bool>
       </attribute>
       <column>
        <property name="text">
-        <string>Word, tag</string>
+        <string>Word</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Tag</string>
        </property>
       </column>
       <column>
@@ -458,17 +466,22 @@
        <enum>QAbstractItemView::ScrollPerPixel</enum>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>100</number>
+       <number>70</number>
       </attribute>
       <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>100</number>
+       <number>50</number>
       </attribute>
       <attribute name="verticalHeaderVisible">
        <bool>false</bool>
       </attribute>
       <column>
        <property name="text">
-        <string>Tag1, tag2</string>
+        <string>Tag 1</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Tag 2</string>
        </property>
       </column>
       <column>
@@ -486,7 +499,7 @@
      <x>0</x>
      <y>0</y>
      <width>600</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

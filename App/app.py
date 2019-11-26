@@ -176,26 +176,29 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.tb_raw.setText(raw_text)
 
     def load_stats(self, tw, stats):
-        if tw == self.tw_stat_t:
-            labels = ['Tag', 'Frequency']
-        elif tw == self.tw_stat_wt:
-            labels = ['Word, tag', 'Frequency']
-        elif tw == self.tw_stat_tt:
-            labels = ['Tag1, tag2', 'Frequency']
-        else:
-            labels = []
         tw.setSortingEnabled(False)
         tw.setRowCount(0)
-        tw.setHorizontalHeaderLabels(labels)
         for key, value in stats.items():
             current_row_count = tw.rowCount()
             tw.insertRow(current_row_count)
-            item = QTableWidgetItem()
-            item.setData(Qt.DisplayRole, str(key))
-            tw.setItem(current_row_count, 0, item)
-            item = QTableWidgetItem()
-            item.setData(Qt.DisplayRole, value)
-            tw.setItem(current_row_count, 1, item)
+            if tw == self.tw_stat_t:
+                item = QTableWidgetItem()
+                item.setData(Qt.DisplayRole, str(key))
+                tw.setItem(current_row_count, 0, item)
+                item = QTableWidgetItem()
+                item.setData(Qt.DisplayRole, value)
+                tw.setItem(current_row_count, 1, item)
+            else:
+                item = QTableWidgetItem()
+                item.setData(Qt.DisplayRole, key[0])
+                tw.setItem(current_row_count, 0, item)
+                item = QTableWidgetItem()
+                item.setData(Qt.DisplayRole, key[1])
+                tw.setItem(current_row_count, 1, item)
+                item = QTableWidgetItem()
+                item.setData(Qt.DisplayRole, value)
+                tw.setItem(current_row_count, 2, item)
+
         tw.setSortingEnabled(True)
 
     def load_words(self, word_list):

@@ -1,6 +1,10 @@
 <RCC>
   <qresource prefix="icon">
+    <file>24/office/pencil_green.png</file>
+    <file>24/objects/magnifier.png</file>
     <file>24x24/3.png</file>
+    <file>24/abstract/plus_green.png</file>
+    <file>24/abstract/minus_red.png</file>
     <file>24x24/11.png</file>
     <file>24x24/96.png</file>
     <file>24x24/1.png</file>

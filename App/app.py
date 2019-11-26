@@ -19,10 +19,10 @@ class CorpusLoadTask(QThread):
     done = pyqtSignal()
     busy_sig = pyqtSignal(bool)
 
-    def __init__(self, corpus_dir):
+    def __init__(self, corpus_dir, corpus):
         super(CorpusLoadTask, self).__init__()
         self.corpus_dir = corpus_dir
-        self.corpus = Corpus()
+        self.corpus = corpus
 
     def run(self):
         self.busy_sig.emit(True)
@@ -44,7 +44,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.action_load.triggered.connect(self.load_corpus)
         self.action_td.triggered.connect(self.show_td)
         self.action_collect.triggered.connect(self.collect_stats)
-        self.action_annotate.triggered.connect(self.annotate)
+        self.action_annotate.triggered.connect(self.load_annotated)
         self.pb_search.clicked.connect(self.search)
         self.pb_edit.clicked.connect(self.edit_word)
         self.le_search.returnPressed.connect(self.search)
@@ -70,12 +70,13 @@ class MyApp(QMainWindow, Ui_MainWindow):
             print('free')
 
     def run_corpus_load_task(self, corpus_dir):
-        corpus_load_task = CorpusLoadTask(corpus_dir)
+        corpus_load_task = CorpusLoadTask(corpus_dir, self.corpus)
 
         def on_corpus_loaded():
             self.corpus = corpus_load_task.corpus
             self.load_words(self.corpus.get_words())
-            self.annotate()
+            self.load_raw()
+            self.load_annotated()
 
         corpus_load_task.done.connect(on_corpus_loaded)
         corpus_load_task.busy_sig.connect(self.switch_progress_range)
@@ -100,6 +101,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.load_words(found)
 
     def on_word_select(self, item):
+        self.gb_word.setEnabled(True)
         self.le_initform.setText('')
         if item.column() != 0:
             item = self.tw_wordfreq.item(item.row(), 0)
@@ -113,22 +115,35 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.load_tags(tags)
 
     def on_tag_select(self, item):
+        self.le_initform.setEnabled(True)
+        self.label_initform.setEnabled(True)
+        self.pb_removetag.setEnabled(True)
+
         self.ed_tag = item.text()
         self.le_initform.setText(self.corpus.get_init_form(self.ed_word, self.ed_tag))
 
     def edit_word(self):
-        new = self.le_editword.text()
-        self.corpus.replace_word(self.ed_word, new)
-        self.load_words(self.corpus.get_words())
-        self.tb_context.setText('')
-        self.le_editword.setText('')
-        self.le_editword.setReadOnly(True)
+        try:
+            new = self.le_editword.text()
+            self.corpus.replace_word(self.ed_word, new)
+            self.load_words(self.corpus.get_words())
+            self.tb_context.setText('')
+            self.le_editword.setText('')
+            self.le_editword.setReadOnly(True)
+            self.lw_tags.clear()
+            self.gb_word.setEnabled(False)
+        except Exception as e:
+            print(e)
 
     def add_tag(self):
         tag = self.cb_tags.currentText()
         if tag in POS_TAGS:
             word = self.ed_word
             self.corpus.add_tag(word, tag)
+            self.le_initform.setText('')
+            self.le_initform.setEnabled(False)
+            self.label_initform.setEnabled(False)
+            self.pb_removetag.setEnabled(False)
             self.load_tags(self.corpus.get_tags(word))
 
     def remove_tag(self):
@@ -137,6 +152,10 @@ class MyApp(QMainWindow, Ui_MainWindow):
         if tag is not None and tag != '':
             word = self.ed_word
             self.corpus.remove_tag(word, tag)
+            self.le_initform.setText('')
+            self.le_initform.setEnabled(False)
+            self.label_initform.setEnabled(False)
+            self.pb_removetag.setEnabled(False)
             self.load_tags(self.corpus.get_tags(word))
 
     def collect_stats(self):
@@ -148,9 +167,13 @@ class MyApp(QMainWindow, Ui_MainWindow):
         except Exception as e:
             print(e)
 
-    def annotate(self):
+    def load_annotated(self):
         annotated_text = self.corpus.get_annotated_text()
         self.tb_annotated.setText(annotated_text)
+
+    def load_raw(self):
+        raw_text = self.corpus.raw_text
+        self.tb_raw.setText(raw_text)
 
     def load_stats(self, tw, stats):
         if tw == self.tw_stat_t:
@@ -201,12 +224,16 @@ class MyApp(QMainWindow, Ui_MainWindow):
             pickle.dump(self.corpus, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def load_corpus(self):
-        filename, _ = QFileDialog.getOpenFileName(self, "Load Corpus")
+        path = "../"
+        filter = "Pickle files (*.pkl)"
+        filename, _ = QFileDialog.getOpenFileName(self, "Load Corpus", path, filter)
         if filename is None or filename == '':
             return
         with open(filename, 'rb') as handle:
             self.corpus = pickle.load(handle)
         self.load_words(self.corpus.get_words())
+        self.load_raw()
+        self.load_annotated()
 
 
 if __name__ == "__main__":

@@ -58,7 +58,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -117,7 +117,7 @@
         </font>
        </property>
        <property name="textAlignment">
-        <set>AlignLeading|AlignVCenter</set>
+        <set>AlignCenter</set>
        </property>
        <property name="background">
         <color alpha="20">
@@ -138,7 +138,7 @@
         </font>
        </property>
        <property name="textAlignment">
-        <set>AlignLeading|AlignVCenter</set>
+        <set>AlignCenter</set>
        </property>
        <property name="background">
         <color alpha="20">
@@ -152,14 +152,18 @@
      <widget class="QPushButton" name="pb_search">
       <property name="geometry">
        <rect>
-        <x>202</x>
+        <x>192</x>
         <y>10</y>
-        <width>81</width>
+        <width>91</width>
         <height>21</height>
        </rect>
       </property>
       <property name="text">
        <string>Search</string>
+      </property>
+      <property name="icon">
+       <iconset resource="App.qrc">
+        <normaloff>:/icon/24/objects/magnifier.png</normaloff>:/icon/24/objects/magnifier.png</iconset>
       </property>
       <property name="default">
        <bool>true</bool>
@@ -170,18 +174,21 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>191</width>
+        <width>181</width>
         <height>21</height>
        </rect>
       </property>
      </widget>
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QGroupBox" name="gb_word">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>290</x>
         <y>10</y>
         <width>281</width>
-        <height>391</height>
+        <height>401</height>
        </rect>
       </property>
       <property name="title">
@@ -196,7 +203,7 @@
          <x>10</x>
          <y>40</y>
          <width>261</width>
-         <height>171</height>
+         <height>151</height>
         </rect>
        </property>
       </widget>
@@ -204,7 +211,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>220</y>
+         <y>200</y>
          <width>181</width>
          <height>21</height>
         </rect>
@@ -230,78 +237,123 @@
        <property name="geometry">
         <rect>
          <x>200</x>
-         <y>220</y>
+         <y>200</y>
          <width>71</width>
          <height>21</height>
         </rect>
        </property>
        <property name="text">
-        <string>Edit word</string>
+        <string>Edit</string>
+       </property>
+       <property name="icon">
+        <iconset resource="App.qrc">
+         <normaloff>:/icon/24/office/pencil_green.png</normaloff>:/icon/24/office/pencil_green.png</iconset>
        </property>
       </widget>
-      <widget class="QWidget" name="gridLayoutWidget">
+      <widget class="QGroupBox" name="groupBox">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>260</y>
-         <width>262</width>
-         <height>120</height>
+         <x>9</x>
+         <y>240</y>
+         <width>261</width>
+         <height>151</height>
         </rect>
        </property>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="1">
-         <widget class="QListWidget" name="lw_tags"/>
-        </item>
-        <item row="0" column="2">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <property name="spacing">
-           <number>4</number>
-          </property>
-          <item>
-           <widget class="QComboBox" name="cb_tags"/>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pb_addtag">
-            <property name="text">
-             <string>Add</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pb_removetag">
-            <property name="text">
-             <string>Remove</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_tags">
-          <property name="text">
-           <string>Tags</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_init">
-          <property name="text">
-           <string>Initial form</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="le_initform">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <property name="title">
+        <string>Tags</string>
+       </property>
+       <widget class="QWidget" name="gridLayoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>20</y>
+          <width>241</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="le_initform">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QListWidget" name="lw_tags"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_initform">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>Initial form:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <property name="spacing">
+            <number>4</number>
+           </property>
+           <item>
+            <widget class="QComboBox" name="cb_tags"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pb_addtag">
+             <property name="toolTip">
+              <string extracomment="Add"/>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="App.qrc">
+               <normaloff>:/icon/24/abstract/plus_green.png</normaloff>:/icon/24/abstract/plus_green.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pb_removetag">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string extracomment="Remove"/>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="icon">
+              <iconset resource="App.qrc">
+               <normaloff>:/icon/24/abstract/minus_red.png</normaloff>:/icon/24/abstract/minus_red.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </widget>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab_4">
+     <attribute name="title">
+      <string>Raw Text</string>
+     </attribute>
+     <widget class="QTextBrowser" name="tb_raw">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>551</width>
+        <height>391</height>
+       </rect>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
@@ -344,6 +396,9 @@
       <attribute name="horizontalHeaderMinimumSectionSize">
        <number>80</number>
       </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
       <column>
        <property name="text">
         <string>Tag</string>
@@ -372,6 +427,9 @@
       </property>
       <attribute name="horizontalHeaderMinimumSectionSize">
        <number>100</number>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
       </attribute>
       <column>
        <property name="text">
@@ -404,6 +462,9 @@
       </attribute>
       <attribute name="horizontalHeaderMinimumSectionSize">
        <number>100</number>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
       </attribute>
       <column>
        <property name="text">
@@ -457,6 +518,9 @@
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -466,8 +530,10 @@
    <addaction name="action_add"/>
    <addaction name="action_load"/>
    <addaction name="action_save"/>
+   <addaction name="separator"/>
    <addaction name="action_annotate"/>
    <addaction name="action_collect"/>
+   <addaction name="separator"/>
    <addaction name="action_td"/>
   </widget>
   <action name="action_add">

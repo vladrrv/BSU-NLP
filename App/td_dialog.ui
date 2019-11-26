@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>240</height>
+    <width>400</width>
+    <height>300</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>300</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>600</width>
+    <height>300</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Tags Definitions</string>
@@ -18,8 +30,8 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>300</width>
-     <height>220</height>
+     <width>381</width>
+     <height>281</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -30,14 +42,14 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>300</width>
-     <height>220</height>
+     <width>200</width>
+     <height>200</height>
     </size>
    </property>
    <property name="maximumSize">
     <size>
-     <width>300</width>
-     <height>220</height>
+     <width>600</width>
+     <height>600</height>
     </size>
    </property>
    <property name="selectionBehavior">
@@ -56,10 +68,22 @@
     <property name="text">
      <string>Tag</string>
     </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
    </column>
    <column>
     <property name="text">
      <string>Definition</string>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
    </column>
   </widget>

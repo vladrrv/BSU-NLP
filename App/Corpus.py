@@ -62,16 +62,16 @@ tag_colormap = {
     'LS': 'Magenta',
     'MD': 'LightCoral',
     'NN': 'GreenYellow',
-    'NNS': 'MediumSpringGreen',
+    'NNS': 'GreenYellow',
     'NNP': 'PaleGreen',
-    'NNPS': 'YellowGreen',
+    'NNPS': 'PaleGreen',
     'PDT': 'MediumSlateBlue',
-    'POS': 'MediumAquamarine',
+    'POS': 'DarkSeaGreen',
     'PRP': 'LightSeaGreen',
-    'PRP$': 'DarkSeaGreen',
+    'PRP$': 'LightSeaGreen',
     'RB': 'Thistle',
-    'RBR': 'PaleTurquoise',
-    'RBS': 'PaleTurquoise',
+    'RBR': 'Thistle',
+    'RBS': 'Thistle',
     'RP': 'PowderBlue',
     'SYM': 'DeepSkyBlue',
     'TO': 'BlanchedAlmond',
@@ -205,7 +205,7 @@ class Corpus:
 
     def get_word_context(self, word, num=0):
         index = self.find_index(word, num)
-        word_start, _, tag = self.tokenized_text[index]
+        word_start, word, tag = self.tokenized_text[index]
         word_end = word_start + len(word)
         num_words = 20
         start_i = max(0, index-num_words)
@@ -249,15 +249,15 @@ class Corpus:
     def remove_tag(self, word, tag):
         del self.freq_tag_dict[word][1][tag]
 
-    def replace_word(self, old, new):
+    def replace_word(self, old, new, num):
+        index = self.find_index(old, num)
+        old_start, old_word, old_tag = self.tokenized_text[index]
         l = len(old)
         l_new = len(new)
         delta = l_new - l
 
         # Replace in raw text
-        starts = [m.start() for m in re.finditer(self.reg_find.format(old), self.raw_text)]
-        start = starts[0]
-        new_text = self.raw_text[0:start] + new + self.raw_text[start + l:]
+        new_text = self.raw_text[:old_start] + new + self.raw_text[old_start + l:]
         self.raw_text = new_text
 
         # Pop from dict
@@ -267,7 +267,6 @@ class Corpus:
             self.freq_tag_dict[old][0] -= 1
 
         # Replace in tokenized text
-        index = self.find_index(old)
         new_tokenized_text = self.tokenized_text[:index]
 
         new_spans = list(self.tokenizer.span_tokenize(new))
@@ -275,10 +274,9 @@ class Corpus:
         for s, t in new_spans:
             new_tokens.append(new[s:t])
         new_tokens_tags = nltk.pos_tag(new_tokens)
-        s_old, _, _ = self.tokenized_text[index]
         for i in range(len(new_spans)):
             word, tag = new_tokens_tags[i]
-            new_tokenized_text.append((new_spans[i][0]+s_old, word, tag))
+            new_tokenized_text.append((new_spans[i][0]+old_start, word, tag))
             if self.is_valid_word(word, tag):
                 self.add_word(word, tag)
 

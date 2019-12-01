@@ -3,6 +3,7 @@ import numpy as np
 import nltk
 from nltk.corpus.reader.plaintext import *
 import sys
+import math
 from PyQt5 import uic
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
@@ -67,11 +68,35 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.te_annotated: QTextEdit = self.te_annotated
         self.le_annotated: QLineEdit = self.le_annotated
         self.cb_annotated: QComboBox = self.cb_annotated
+        self.grid_legend: QGridLayout = self.grid_legend
+        self.pb_edit_annot: QPushButton = self.pb_edit_annot
+
+    def set_legend(self):
+        colors = {}
+        for tag, color in tag_colormap.items():
+            if color not in colors:
+                colors[color] = [tag]
+            else:
+                colors[color].append(tag)
+
+        cols = 2
+        rows = math.ceil(len(colors.keys())/cols)
+        for k, (color, tags) in enumerate(colors.items()):
+            i = k // cols
+            j = k % cols
+            icon = QLabel()
+            icon.setStyleSheet(f"background-color: {color};")
+            icon.setFixedSize(20, 20)
+            label = QLabel(','.join(tags))
+            self.grid_legend.addWidget(icon, i, j*2)
+            self.grid_legend.addWidget(label, i, j*2+1)
 
     def __init__(self):
         QMainWindow.__init__(self)
         Ui_MainWindow.__init__(self)
         self.setupUi(self)
+
+        self.set_legend()
 
         self.action_add.triggered.connect(self.open_dir)
         self.action_save.triggered.connect(self.save_corpus)
@@ -83,7 +108,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.pb_search.clicked.connect(self.search)
         self.pb_edit.clicked.connect(self.edit_word)
         self.le_search.returnPressed.connect(self.search)
-        self.le_search.installEventFilter(self)
+        self.le_search.textChanged.connect(self.search)
         self.le_editword.returnPressed.connect(self.edit_word)
         self.tw_wordfreq.itemClicked.connect(self.on_word_select)
 
@@ -98,6 +123,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.te_annotated.viewport().installEventFilter(self)
         self.cb_annotated.currentTextChanged.connect(self.edit_tag)
         self.cb_annotated.addItems(list(tag_colormap.keys()))
+        self.pb_edit_annot.clicked.connect(self.edit_annot)
 
         self.corpus = Corpus()
 
@@ -143,7 +169,6 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
     def search(self):
         char_seq = self.le_search.text()
-        print(char_seq)
         found = self.corpus.get_words()
         if not (char_seq is None or char_seq == ''):
             reg = "^"+char_seq
@@ -190,7 +215,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
     def edit_word(self):
         try:
             new = self.le_editword.text()
-            self.corpus.replace_word(self.cur_word, new)
+            self.corpus.replace_word(self.cur_word, new, self.cur_num)
             self.load_words(self.corpus.get_words())
             self.tb_context.setText('')
             self.le_editword.setText('')
@@ -246,6 +271,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.le_annotated.setText('')
         self.le_annotated.setEnabled(False)
         self.cb_annotated.setEnabled(False)
+        self.pb_edit_annot.setEnabled(False)
         cursor = self.te_annotated.textCursor()
         i = cursor.position()
         tok_index, word, tag = self.corpus.find_word_by_raw_index(i)
@@ -256,13 +282,19 @@ class MyApp(QMainWindow, Ui_MainWindow):
             self.cb_annotated.setCurrentText(tag)
             self.cb_annotated.setEnabled(True)
             self.le_annotated.setEnabled(True)
+            self.pb_edit_annot.setEnabled(True)
             start, _, _ = self.corpus.tokenized_text[tok_index]
             end = start + len(word)
             cursor.setPosition(start)
             cursor.setPosition(end, QTextCursor.KeepAnchor)
             self.te_annotated.setTextCursor(cursor)
 
+    def edit_annot(self):
+        pass
+
     def load_annotated(self):
+        self.cur_word_annot = None
+        self.cur_tag_annot = None
         annotated_text = self.corpus.get_annotated_text()
         self.te_annotated.setText('')
         self.te_annotated.append(annotated_text)

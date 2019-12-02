@@ -249,18 +249,26 @@ class Corpus:
     def remove_tag(self, word, tag):
         del self.freq_tag_dict[word][1][tag]
 
-    def replace_word(self, old, new, num):
-        index = self.find_index(old, num)
+    def replace_tag(self, index, new_tag):
         old_start, old_word, old_tag = self.tokenized_text[index]
-        l = len(old)
-        l_new = len(new)
-        delta = l_new - l
+        self.tokenized_text[index] = (old_start, old_word, new_tag)
+        self.remove_tag(old_word, old_tag)
+        self.add_tag(old_word, new_tag)
+
+    def replace_word(self, index, new_word):
+        old_start, old_word, old_tag = self.tokenized_text[index]
+        l_old = len(old_word)
+        l_new = len(new_word)
+        delta = l_new - l_old
 
         # Replace in raw text
-        new_text = self.raw_text[:old_start] + new + self.raw_text[old_start + l:]
+        new_text = self.raw_text[:old_start] + new_word + self.raw_text[old_start + l_old:]
         self.raw_text = new_text
 
         # Pop from dict
+        old = old_word
+        if old_word not in self.freq_tag_dict:
+            old = old_word.lower()
         if self.freq_tag_dict[old][0] == 1:
             self.freq_tag_dict.pop(old)
         else:
@@ -269,10 +277,10 @@ class Corpus:
         # Replace in tokenized text
         new_tokenized_text = self.tokenized_text[:index]
 
-        new_spans = list(self.tokenizer.span_tokenize(new))
+        new_spans = list(self.tokenizer.span_tokenize(new_word))
         new_tokens = []
         for s, t in new_spans:
-            new_tokens.append(new[s:t])
+            new_tokens.append(new_word[s:t])
         new_tokens_tags = nltk.pos_tag(new_tokens)
         for i in range(len(new_spans)):
             word, tag = new_tokens_tags[i]
@@ -330,6 +338,11 @@ class Corpus:
             prev_e = e
 
         return ''.join(colored_text)
+
+    def get_word_bounds(self, index):
+        start, word, _ = self.tokenized_text[index]
+        end = start + len(word)
+        return start, end
 
     def get_freq(self, word):
         return self.freq_tag_dict.get(word, (0, {}))[0]

@@ -1,4 +1,5 @@
 import os
+import pickle
 import numpy as np
 import nltk
 from nltk.corpus.reader.plaintext import *
@@ -41,6 +42,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
     cur_num = 0
     cur_word = None
     cur_tag = None
+    cur_index = None
     cur_word_annot = None
     cur_tag_annot = None
 
@@ -121,7 +123,6 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.cb_tags.addItems(POS_TAGS)
 
         self.te_annotated.viewport().installEventFilter(self)
-        self.cb_annotated.currentTextChanged.connect(self.edit_tag)
         self.cb_annotated.addItems(list(tag_colormap.keys()))
         self.pb_edit_annot.clicked.connect(self.edit_annot)
 
@@ -215,7 +216,8 @@ class MyApp(QMainWindow, Ui_MainWindow):
     def edit_word(self):
         try:
             new = self.le_editword.text()
-            self.corpus.replace_word(self.cur_word, new, self.cur_num)
+            index = self.find_index(self.cur_word, self.cur_num)
+            self.corpus.replace_word(index, new)
             self.load_words(self.corpus.get_words())
             self.tb_context.setText('')
             self.le_editword.setText('')
@@ -223,13 +225,6 @@ class MyApp(QMainWindow, Ui_MainWindow):
             self.lw_tags.clear()
             self.gb_word.setEnabled(False)
             self.pb_removetag.setEnabled(False)
-        except Exception as e:
-            print(e)
-
-    def edit_tag(self):
-        try:
-            new = self.cb_annotated.currentText()
-            print(new)
         except Exception as e:
             print(e)
 
@@ -275,6 +270,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         cursor = self.te_annotated.textCursor()
         i = cursor.position()
         tok_index, word, tag = self.corpus.find_word_by_raw_index(i)
+        self.cur_index = tok_index
         if word is not None:
             self.cur_word_annot = word
             self.cur_tag_annot = tag
@@ -283,14 +279,20 @@ class MyApp(QMainWindow, Ui_MainWindow):
             self.cb_annotated.setEnabled(True)
             self.le_annotated.setEnabled(True)
             self.pb_edit_annot.setEnabled(True)
-            start, _, _ = self.corpus.tokenized_text[tok_index]
-            end = start + len(word)
+            start, end = self.corpus.get_word_bounds(tok_index)
             cursor.setPosition(start)
             cursor.setPosition(end, QTextCursor.KeepAnchor)
             self.te_annotated.setTextCursor(cursor)
 
     def edit_annot(self):
-        pass
+        word = self.le_annotated.text()
+        tag = self.cb_annotated.currentText()
+        if word != self.cur_word_annot:
+            print(word)
+            self.corpus.replace_word(self.cur_index, word)
+        elif tag != self.cur_tag_annot:
+            print(tag)
+            self.corpus.replace_tag(self.cur_index, tag)
 
     def load_annotated(self):
         self.cur_word_annot = None

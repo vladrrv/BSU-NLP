@@ -42,7 +42,7 @@
    </size>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QProgressBar" name="progressBar">
+   <widget class="QProgressBar" name="progress_bar">
     <property name="geometry">
      <rect>
       <x>6</x>
@@ -58,7 +58,7 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QTabWidget" name="tabWidget">
+   <widget class="QTabWidget" name="tabs">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -68,97 +68,12 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_dict">
      <attribute name="title">
       <string>Dictionary</string>
      </attribute>
-     <widget class="QTableWidget" name="tw_wordfreq">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>50</y>
-        <width>271</width>
-        <height>391</height>
-       </rect>
-      </property>
-      <property name="editTriggers">
-       <set>QAbstractItemView::NoEditTriggers</set>
-      </property>
-      <property name="selectionMode">
-       <enum>QAbstractItemView::SingleSelection</enum>
-      </property>
-      <property name="selectionBehavior">
-       <enum>QAbstractItemView::SelectRows</enum>
-      </property>
-      <property name="verticalScrollMode">
-       <enum>QAbstractItemView::ScrollPerPixel</enum>
-      </property>
-      <property name="horizontalScrollMode">
-       <enum>QAbstractItemView::ScrollPerPixel</enum>
-      </property>
-      <property name="sortingEnabled">
-       <bool>true</bool>
-      </property>
-      <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>110</number>
-      </attribute>
-      <attribute name="horizontalHeaderMinimumSectionSize">
-       <number>40</number>
-      </attribute>
-      <attribute name="verticalHeaderVisible">
-       <bool>false</bool>
-      </attribute>
-      <attribute name="verticalHeaderDefaultSectionSize">
-       <number>16</number>
-      </attribute>
-      <attribute name="verticalHeaderMinimumSectionSize">
-       <number>16</number>
-      </attribute>
-      <column>
-       <property name="text">
-        <string>Word</string>
-       </property>
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="textAlignment">
-        <set>AlignCenter</set>
-       </property>
-       <property name="background">
-        <color alpha="20">
-         <red>0</red>
-         <green>0</green>
-         <blue>0</blue>
-        </color>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Frequency</string>
-       </property>
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="textAlignment">
-        <set>AlignCenter</set>
-       </property>
-       <property name="background">
-        <color alpha="20">
-         <red>0</red>
-         <green>0</green>
-         <blue>0</blue>
-        </color>
-       </property>
-      </column>
-     </widget>
      <widget class="QGroupBox" name="gb_word">
       <property name="enabled">
        <bool>false</bool>
@@ -417,49 +332,132 @@
        </widget>
       </widget>
      </widget>
-     <widget class="QWidget" name="horizontalLayoutWidget_3">
+     <widget class="QWidget" name="verticalLayoutWidget_4">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
         <width>271</width>
-        <height>31</height>
+        <height>431</height>
        </rect>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <property name="spacing">
-        <number>2</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <widget class="QLineEdit" name="le_search">
-         <property name="font">
-          <font>
-           <pointsize>10</pointsize>
-          </font>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>2</number>
          </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="placeholderText">
-          <string>Type here to search</string>
-         </property>
-        </widget>
+         <item>
+          <widget class="QLineEdit" name="le_search">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="placeholderText">
+            <string>Type here to search</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pb_search">
+           <property name="text">
+            <string>Search</string>
+           </property>
+           <property name="icon">
+            <iconset resource="App.qrc">
+             <normaloff>:/icon/24x24/84.png</normaloff>:/icon/24x24/84.png</iconset>
+           </property>
+           <property name="default">
+            <bool>true</bool>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="pb_search">
-         <property name="text">
-          <string>Search</string>
+        <widget class="QTableWidget" name="tw_wordfreq">
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
          </property>
-         <property name="icon">
-          <iconset resource="App.qrc">
-           <normaloff>:/icon/24x24/84.png</normaloff>:/icon/24x24/84.png</iconset>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
-         <property name="default">
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+         <property name="horizontalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+         <property name="sortingEnabled">
           <bool>true</bool>
          </property>
-         <property name="flat">
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>110</number>
+         </attribute>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>40</number>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
           <bool>false</bool>
-         </property>
+         </attribute>
+         <attribute name="verticalHeaderDefaultSectionSize">
+          <number>16</number>
+         </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>16</number>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Word</string>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="textAlignment">
+           <set>AlignCenter</set>
+          </property>
+          <property name="background">
+           <color alpha="20">
+            <red>0</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Frequency</string>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="textAlignment">
+           <set>AlignCenter</set>
+          </property>
+          <property name="background">
+           <color alpha="20">
+            <red>0</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </property>
+         </column>
         </widget>
        </item>
       </layout>
@@ -470,11 +468,24 @@
       <string>Raw Text</string>
      </attribute>
      <widget class="QTextBrowser" name="tb_raw">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>220</x>
+        <y>10</y>
+        <width>441</width>
+        <height>431</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="lw_raw">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>651</width>
+        <width>201</width>
         <height>431</height>
        </rect>
       </property>
@@ -490,8 +501,12 @@
         <x>10</x>
         <y>10</y>
         <width>391</width>
-        <height>401</height>
+        <height>431</height>
        </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">selection-color: rgba(255, 255, 255, 1);
+selection-background-color: rgba(0, 0, 0, 1);</string>
       </property>
       <property name="readOnly">
        <bool>true</bool>
@@ -506,7 +521,7 @@
         <x>410</x>
         <y>70</y>
         <width>261</width>
-        <height>341</height>
+        <height>371</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="grid_legend"/>
@@ -553,7 +568,7 @@
             </font>
            </property>
            <property name="readOnly">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -869,6 +884,9 @@
    </property>
   </action>
   <action name="action_annotate">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="App.qrc">
      <normaloff>:/icon/24x24/96.png</normaloff>:/icon/24x24/96.png</iconset>

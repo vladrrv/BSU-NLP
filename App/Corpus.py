@@ -1,10 +1,13 @@
 import numpy as np
 import re
+import pickle
 import string
 import nltk
 from nltk.tokenize import *
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import wordnet
+
+from PyQt5.QtCore import *
 
 # nltk.download('averaged_perceptron_tagger')
 # nltk.download('wordnet')
@@ -54,12 +57,12 @@ tag_colormap = {
     'CD': 'MediumPurple',
     'DT': 'LightPink',
     'EX': 'Moccasin',
-    'FW': 'Khaki',
+    'FW': 'HotPink',
     'IN': 'Lavender',
     'JJ': 'Aqua',
     'JJR': 'Aqua',
     'JJS': 'Aqua',
-    'LS': 'Magenta',
+    'LS': 'LemonChiffon',
     'MD': 'LightCoral',
     'NN': 'GreenYellow',
     'NNS': 'GreenYellow',
@@ -73,7 +76,7 @@ tag_colormap = {
     'RBR': 'Thistle',
     'RBS': 'Thistle',
     'RP': 'PowderBlue',
-    'SYM': 'DeepSkyBlue',
+    'SYM': 'LemonChiffon',
     'TO': 'BlanchedAlmond',
     'UH': 'Tan',
     'VB': 'LightSalmon',
@@ -86,7 +89,7 @@ tag_colormap = {
     'WP': 'Silver',
     'WP$': 'Silver',
     'WRB': 'Gainsboro',
-    'OTHER': 'HoneyDew'
+    'OTHER': 'LemonChiffon'
 }
 
 
@@ -121,7 +124,10 @@ def preprocess_text(text):
     return text
 
 
-class Corpus:
+class Corpus(QObject):
+
+    status_sig = pyqtSignal(str)
+
     reg = r'[A-Za-z]+([\'|\-][A-Za-z]+)*'
     reg_find = r'(^|[^\w\-\'])({})([^\w\-\']|$)'
     sep = '\n\n**\n\n'
@@ -130,21 +136,43 @@ class Corpus:
     html_colored_span = "<span style=\"background-color:{};\">{}</span>"
 
     def __init__(self):
+        super().__init__()
         self.raw_text = ''
+        self.text_spans = {}
         self.tokenized_text = []
         self.freq_tag_dict = {}
         self.tokenizer = TreebankWordTokenizer()
         self.sent_tokenizer = PunktSentenceTokenizer()
 
+        self.modified_words = set()
+
+    def load_from_pickle(self, pickle_file):
+        with open(pickle_file, 'rb') as handle:
+            data = pickle.load(handle)
+            self.raw_text, self.text_spans, self.tokenized_text, self.freq_tag_dict = data
+
+    def save_to_pickle(self, pickle_file):
+        with open(pickle_file, 'wb') as handle:
+            data = self.raw_text, self.text_spans, self.tokenized_text, self.freq_tag_dict
+            pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
     def is_valid_word(self, word, tag):
         return tag in POS_TAGS and re.fullmatch(self.reg, word)
 
-    def add_text(self, text):
+    def add_text(self, text, text_name='New text'):
+        self.status_sig.emit(f'Adding "{text_name}" ...')
         try:
             print('Preprocessing...')
             text = preprocess_text(text)
             prev_len = len(self.raw_text)+len(self.sep)
             self.raw_text += self.sep + text
+
+            default_name = text_name + ' ({})'
+            count = 0
+            while text_name in self.text_spans:
+                count += 1
+                text_name = default_name.format(count)
+            self.text_spans[text_name] = (prev_len, prev_len + len(text))
 
             print('Tokenizing...')
             sent_spans = list(self.sent_tokenizer.span_tokenize(text))
@@ -182,7 +210,9 @@ class Corpus:
     def get_words(self):
         words = list(self.freq_tag_dict.keys())
         words.sort(key=lambda w: w.lower())
-        return words
+        modified = self.modified_words
+        self.modified_words = set()
+        return words, modified
 
     def find_index(self, word, num):
         count = 0
@@ -194,11 +224,13 @@ class Corpus:
                 count += 1
         return None
 
-    def find_word_by_raw_index(self, index):
+    def find_word_by_raw_index(self, text_name, index):
+        text_start, text_end = self.text_spans[text_name]
+        index += text_start
         for i, (start, word, tag) in enumerate(self.tokenized_text):
             end = start + len(word)
             if start <= index < end:
-                return i, word, tag
+                return i, word, tag if tag in POS_TAGS else 'OTHER'
             elif start > index:
                 break
         return None, None, None
@@ -222,6 +254,7 @@ class Corpus:
         return "".join(context)
 
     def add_word(self, word, tag):
+        self.modified_words.add(word)
         if word[0].isupper():
             lower_word = word.lower()
             lower_val = self.freq_tag_dict.get(lower_word, [0, None])[0]
@@ -264,6 +297,11 @@ class Corpus:
         # Replace in raw text
         new_text = self.raw_text[:old_start] + new_word + self.raw_text[old_start + l_old:]
         self.raw_text = new_text
+        for text_name, (text_start, text_end) in self.text_spans.items():
+            if text_start <= old_start < text_end:
+                self.text_spans[text_name] = (text_start, text_end + delta)
+            if old_start < text_start:
+                self.text_spans[text_name] = (text_start + delta, text_end + delta)
 
         # Pop from dict
         old = old_word
@@ -318,11 +356,16 @@ class Corpus:
 
         return tag_freq, word_tag_freq, tag_tag_freq
 
-    def get_annotated_text(self):
+    def get_annotated_text(self, text_name):
         annotated_text = []
         colored_text = []
-        prev_e = 0
+        text_start, text_end = self.text_spans[text_name]
+        prev_e = text_start
         for s, w, t in self.tokenized_text:
+            if text_start > s:
+                continue
+            if s >= text_end:
+                break
             w = "\"" if w == "``" or w == "''" else w
             e = s+len(w)
             trash = self.raw_text[prev_e:s]
@@ -339,10 +382,18 @@ class Corpus:
 
         return ''.join(colored_text)
 
-    def get_word_bounds(self, index):
+    def get_text_names(self):
+        return list(self.text_spans.keys())
+
+    def get_raw_text(self, text_name):
+        text_start, text_end = self.text_spans[text_name]
+        return self.raw_text[text_start:text_end]
+
+    def get_word_bounds(self, text_name, index):
+        text_start, _ = self.text_spans[text_name]
         start, word, _ = self.tokenized_text[index]
         end = start + len(word)
-        return start, end
+        return start - text_start, end - text_start
 
     def get_freq(self, word):
         return self.freq_tag_dict.get(word, (0, {}))[0]

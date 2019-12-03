@@ -1,5 +1,4 @@
 import os
-import pickle
 import numpy as np
 import nltk
 from nltk.corpus.reader.plaintext import *
@@ -30,9 +29,14 @@ class CorpusLoadTask(QThread):
     def run(self):
         self.busy_sig.emit(True)
         corpus_reader = PlaintextCorpusReader(self.corpus_dir, '.*')
-        raw_text = corpus_reader.raw()
-        self.corpus.add_text(raw_text)
-
+        files = corpus_reader.fileids()
+        try:
+            for file in files:
+                with open(os.path.join(self.corpus_dir, file), 'r', encoding='utf-8') as f:
+                    text = f.read()
+                self.corpus.add_text(text, file)
+        except Exception as e:
+            print(e)
         self.busy_sig.emit(False)
         self.done.emit()
 
@@ -42,17 +46,23 @@ class MyApp(QMainWindow, Ui_MainWindow):
     cur_num = 0
     cur_word = None
     cur_tag = None
+    cur_text_name = None
     cur_index = None
     cur_word_annot = None
     cur_tag_annot = None
 
     def _init_fields(self):
+        self.tabs: QTabWidget = self.tabs
+
         self.action_add: QAction = self.action_add
         self.action_save: QAction = self.action_save
         self.action_load: QAction = self.action_load
         self.action_td: QAction = self.action_td
         self.action_collect: QAction = self.action_collect
         self.action_annotate: QAction = self.action_annotate
+
+        self.progress_bar: QProgressBar = self.progress_bar
+        self.label_progress: QLabel = self.label_progress
 
         self.pb_search: QPushButton = self.pb_search
         self.pb_edit: QPushButton = self.pb_edit
@@ -67,11 +77,19 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.pb_prev: QPushButton = self.pb_prev
         self.pb_next: QPushButton = self.pb_next
 
+        self.tb_raw: QTextBrowser = self.tb_raw
+        self.lw_raw: QListWidget = self.lw_raw
+
+        self.tab_annotated: QWidget = self.tab_annotated
         self.te_annotated: QTextEdit = self.te_annotated
         self.le_annotated: QLineEdit = self.le_annotated
         self.cb_annotated: QComboBox = self.cb_annotated
         self.grid_legend: QGridLayout = self.grid_legend
         self.pb_edit_annot: QPushButton = self.pb_edit_annot
+
+        self.tw_stat_t: QTableWidget = self.tw_stat_t
+        self.tw_stat_wt: QTableWidget = self.tw_stat_wt
+        self.tw_stat_tt: QTableWidget = self.tw_stat_tt
 
     def set_legend(self):
         colors = {}
@@ -89,7 +107,11 @@ class MyApp(QMainWindow, Ui_MainWindow):
             icon = QLabel()
             icon.setStyleSheet(f"background-color: {color};")
             icon.setFixedSize(20, 20)
-            label = QLabel(','.join(tags))
+            label = QLineEdit()
+            label.setText(', '.join(tags))
+            label.setReadOnly(True)
+            label.setFixedSize(80, 20)
+            label.setStyleSheet(f"border: none;")
             self.grid_legend.addWidget(icon, i, j*2)
             self.grid_legend.addWidget(label, i, j*2+1)
 
@@ -122,45 +144,48 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
         self.cb_tags.addItems(POS_TAGS)
 
+        self.lw_raw.selectionModel().selectionChanged.connect(self.on_raw_select)
+
         self.te_annotated.viewport().installEventFilter(self)
         self.cb_annotated.addItems(list(tag_colormap.keys()))
         self.pb_edit_annot.clicked.connect(self.edit_annot)
 
         self.corpus = Corpus()
 
-    def eventFilter(self, object, event):
-        if object == self.te_annotated.viewport():
+    def eventFilter(self, obj, event):
+        if obj == self.te_annotated.viewport():
             if event.type() == QEvent.MouseButtonRelease:
                 self.peek_word()
                 return True
-        elif object == self.le_search:
-            if event.type() == QEvent.KeyRelease:
-                self.search()
-                return True
         return False
+
+    def set_status(self, status):
+        self.label_progress.setText(status)
 
     def switch_progress_range(self, is_busy):
         if is_busy:
-            self.progressBar.setRange(0, 0)
-            print('busy')
+            self.progress_bar.setRange(0, 0)
         else:
-            self.progressBar.setRange(0, 100)
-            print('free')
+            self.progress_bar.setRange(0, 100)
 
     def run_corpus_load_task(self, corpus_dir):
         corpus_load_task = CorpusLoadTask(corpus_dir, self.corpus)
+        self.corpus.status_sig.connect(self.set_status)
 
         def on_corpus_loaded():
             self.corpus = corpus_load_task.corpus
-            self.load_words(self.corpus.get_words())
-            self.load_raw()
+            words, modified = self.corpus.get_words()
+            self.load_words(words, modified)
+            self.lw_raw.clear()
+            self.lw_raw.addItems(self.corpus.get_text_names())
+            self.set_status('Ready')
 
         corpus_load_task.done.connect(on_corpus_loaded)
         corpus_load_task.busy_sig.connect(self.switch_progress_range)
         corpus_load_task.start()
 
     def open_dir(self):
-        corpus_dir = QFileDialog.getExistingDirectory(self, "Select Directory")
+        corpus_dir = QFileDialog.getExistingDirectory(self, "Select Directory", "../")
         if corpus_dir is None or corpus_dir == '':
             return
         self.run_corpus_load_task(corpus_dir)
@@ -170,11 +195,11 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
     def search(self):
         char_seq = self.le_search.text()
-        found = self.corpus.get_words()
+        found, modified = self.corpus.get_words()
         if not (char_seq is None or char_seq == ''):
             reg = "^"+char_seq
             found = [word for word in found if re.match(reg, word) is not None]
-        self.load_words(found)
+        self.load_words(found, modified)
 
     def on_word_select(self, item):
         self.gb_word.setEnabled(True)
@@ -218,7 +243,8 @@ class MyApp(QMainWindow, Ui_MainWindow):
             new = self.le_editword.text()
             index = self.find_index(self.cur_word, self.cur_num)
             self.corpus.replace_word(index, new)
-            self.load_words(self.corpus.get_words())
+            words, modified = self.corpus.get_words()
+            self.load_words( words, modified)
             self.tb_context.setText('')
             self.le_editword.setText('')
             self.le_editword.setReadOnly(True)
@@ -269,7 +295,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.pb_edit_annot.setEnabled(False)
         cursor = self.te_annotated.textCursor()
         i = cursor.position()
-        tok_index, word, tag = self.corpus.find_word_by_raw_index(i)
+        tok_index, word, tag = self.corpus.find_word_by_raw_index(self.cur_text_name, i)
         self.cur_index = tok_index
         if word is not None:
             self.cur_word_annot = word
@@ -279,31 +305,47 @@ class MyApp(QMainWindow, Ui_MainWindow):
             self.cb_annotated.setEnabled(True)
             self.le_annotated.setEnabled(True)
             self.pb_edit_annot.setEnabled(True)
-            start, end = self.corpus.get_word_bounds(tok_index)
+            start, end = self.corpus.get_word_bounds(self.cur_text_name, tok_index)
             cursor.setPosition(start)
             cursor.setPosition(end, QTextCursor.KeepAnchor)
             self.te_annotated.setTextCursor(cursor)
 
     def edit_annot(self):
+        cursor = self.te_annotated.textCursor()
         word = self.le_annotated.text()
         tag = self.cb_annotated.currentText()
         if word != self.cur_word_annot:
-            print(word)
             self.corpus.replace_word(self.cur_index, word)
+            self.load_words(*self.corpus.get_words())
+            cursor.insertText(word)
         elif tag != self.cur_tag_annot:
-            print(tag)
             self.corpus.replace_tag(self.cur_index, tag)
+            format = cursor.charFormat()
+            format.setBackground(QColor(tag_colormap[tag]))
+            cursor.setCharFormat(format)
 
     def load_annotated(self):
         self.cur_word_annot = None
         self.cur_tag_annot = None
-        annotated_text = self.corpus.get_annotated_text()
-        self.te_annotated.setText('')
+        annotated_text = self.corpus.get_annotated_text(self.cur_text_name)
+        self.te_annotated.clear()
         self.te_annotated.append(annotated_text)
+        self.tabs.setCurrentIndex(2)
 
-    def load_raw(self):
-        raw_text = self.corpus.raw_text
+    def on_raw_select(self):
+        selection = self.lw_raw.selectedItems()
+        if len(selection) == 0:
+            self.cur_text_name = None
+            self.tb_raw.clear()
+            self.tb_raw.setEnabled(False)
+            self.action_annotate.setEnabled(False)
+            return
+
+        self.cur_text_name = selection[0].text()
+        raw_text = self.corpus.get_raw_text(self.cur_text_name)
+        self.tb_raw.setEnabled(True)
         self.tb_raw.setText(raw_text)
+        self.action_annotate.setEnabled(True)
 
     def load_stats(self, tw, stats):
         tw.setSortingEnabled(False)
@@ -331,7 +373,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
         tw.setSortingEnabled(True)
 
-    def load_words(self, word_list):
+    def load_words(self, word_list, modified=set()):
         self.tw_wordfreq.setSortingEnabled(False)
         self.tw_wordfreq.setRowCount(0)
         self.tw_wordfreq.setHorizontalHeaderLabels(['Word', 'Frequency'])
@@ -339,6 +381,8 @@ class MyApp(QMainWindow, Ui_MainWindow):
             current_row_count = self.tw_wordfreq.rowCount()
             self.tw_wordfreq.insertRow(current_row_count)
             item = QTableWidgetItem(word)
+            if word in modified:
+                item.setBackground(QColor('#ddffdd'))
             self.tw_wordfreq.setItem(current_row_count, 0, item)
             item = QTableWidgetItem()
             item.setData(Qt.DisplayRole, self.corpus.get_freq(word))
@@ -354,17 +398,17 @@ class MyApp(QMainWindow, Ui_MainWindow):
         filename, _ = QFileDialog.getSaveFileName(self, "Save Corpus", "../", "Pickle files (*.pkl)")
         if filename is None or filename == '':
             return
-        with open(filename, 'wb') as handle:
-            pickle.dump(self.corpus, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        self.corpus.save_to_pickle(filename)
 
     def load_corpus(self):
         filename, _ = QFileDialog.getOpenFileName(self, "Load Corpus", "../", "Pickle files (*.pkl)")
         if filename is None or filename == '':
             return
-        with open(filename, 'rb') as handle:
-            self.corpus = pickle.load(handle)
-        self.load_words(self.corpus.get_words())
-        self.load_raw()
+        self.corpus.load_from_pickle(filename)
+        words, modified = self.corpus.get_words()
+        self.load_words(words, modified)
+        self.lw_raw.clear()
+        self.lw_raw.addItems(self.corpus.get_text_names())
 
 
 if __name__ == "__main__":

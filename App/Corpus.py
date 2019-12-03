@@ -143,23 +143,26 @@ class Corpus(QObject):
         self.freq_tag_dict = {}
         self.tokenizer = TreebankWordTokenizer()
         self.sent_tokenizer = PunktSentenceTokenizer()
+        self.stats = ({}, {}, {})
+        self.refresh_stats = False
 
         self.modified_words = set()
 
     def load_from_pickle(self, pickle_file):
         with open(pickle_file, 'rb') as handle:
             data = pickle.load(handle)
-            self.raw_text, self.text_spans, self.tokenized_text, self.freq_tag_dict = data
+            self.raw_text, self.text_spans, self.tokenized_text, self.freq_tag_dict, self.stats = data
 
     def save_to_pickle(self, pickle_file):
         with open(pickle_file, 'wb') as handle:
-            data = self.raw_text, self.text_spans, self.tokenized_text, self.freq_tag_dict
+            data = self.raw_text, self.text_spans, self.tokenized_text, self.freq_tag_dict, self.stats
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def is_valid_word(self, word, tag):
         return tag in POS_TAGS and re.fullmatch(self.reg, word)
 
     def add_text(self, text, text_name='New text'):
+
         self.status_sig.emit(f'Adding "{text_name}" ...')
         try:
             print('Preprocessing...')
@@ -254,6 +257,7 @@ class Corpus(QObject):
         return "".join(context)
 
     def add_word(self, word, tag):
+        self.refresh_stats = True
         self.modified_words.add(word)
         if word[0].isupper():
             lower_word = word.lower()
@@ -333,28 +337,30 @@ class Corpus(QObject):
         self.tokenized_text = new_tokenized_text
 
     def collect_stats(self):
-        tag_freq = {tag: 0 for tag in POS_TAGS}
-        word_tag_freq = {}
-        tag_tag_freq = {}
-        prev_wt = None
-        for s, w, t in self.tokenized_text:
-            if t not in POS_TAGS or re.fullmatch(self.reg, w) is None:
-                continue
-            tag_freq[t] += 1
-            wt = (w.lower(), t)
-            if word_tag_freq.get(wt):
-                word_tag_freq[wt] += 1
-            else:
-                word_tag_freq[wt] = 1
-            if prev_wt:
-                tag_pair = (prev_wt[1], t)
-                if tag_tag_freq.get(tag_pair):
-                    tag_tag_freq[tag_pair] += 1
+        if self.refresh_stats:
+            tag_freq = {tag: 0 for tag in POS_TAGS}
+            word_tag_freq = {}
+            tag_tag_freq = {}
+            prev_wt = None
+            for s, w, t in self.tokenized_text:
+                if t not in POS_TAGS or re.fullmatch(self.reg, w) is None:
+                    continue
+                tag_freq[t] += 1
+                wt = (w.lower(), t)
+                if word_tag_freq.get(wt):
+                    word_tag_freq[wt] += 1
                 else:
-                    tag_tag_freq[tag_pair] = 1
-            prev_wt = wt
-
-        return tag_freq, word_tag_freq, tag_tag_freq
+                    word_tag_freq[wt] = 1
+                if prev_wt:
+                    tag_pair = (prev_wt[1], t)
+                    if tag_tag_freq.get(tag_pair):
+                        tag_tag_freq[tag_pair] += 1
+                    else:
+                        tag_tag_freq[tag_pair] = 1
+                prev_wt = wt
+            self.stats = tag_freq, word_tag_freq, tag_tag_freq
+            self.refresh_stats = False
+        return self.stats
 
     def get_annotated_text(self, text_name):
         annotated_text = []

@@ -52,6 +52,8 @@ class MyApp(QMainWindow, Ui_MainWindow):
     cur_tag_annot = None
 
     def _init_fields(self):
+        self.pb_query: QPushButton = self.pb_query
+
         self.tabs: QTabWidget = self.tabs
 
         self.action_add: QAction = self.action_add
@@ -128,6 +130,8 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.action_td.triggered.connect(self.show_td)
         self.action_collect.triggered.connect(self.collect_stats)
         self.action_annotate.triggered.connect(self.load_annotated)
+
+        self.pb_query.clicked.connect(self.query)
 
         self.pb_search.clicked.connect(self.search)
         self.pb_edit.clicked.connect(self.edit_word)
@@ -409,6 +413,17 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.load_words(words, modified)
         self.lw_raw.clear()
         self.lw_raw.addItems(self.corpus.get_text_names())
+
+    def query(self):
+        relevant_texts = self.corpus.get_text_names()
+        try:
+            phrase = self.le_query.text()
+            if phrase:
+                relevant_texts, _ = self.corpus.query(phrase)
+            self.lw_raw.clear()
+            self.lw_raw.addItems(list(relevant_texts))
+        except Exception as e:
+            print(e)
 
 
 if __name__ == "__main__":

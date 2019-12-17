@@ -139,6 +139,8 @@ class Corpus(QObject):
         super().__init__()
         self.raw_text = ''
         self.text_spans = {}
+        self.text_dicts = {}
+        self.text_inf_dicts = {}
         self.tokenized_text = []
         self.freq_tag_dict = {}
         self.tokenizer = TreebankWordTokenizer()
@@ -151,11 +153,11 @@ class Corpus(QObject):
     def load_from_pickle(self, pickle_file):
         with open(pickle_file, 'rb') as handle:
             data = pickle.load(handle)
-            self.raw_text, self.text_spans, self.tokenized_text, self.freq_tag_dict, self.stats = data
+            self.raw_text, self.text_spans, self.text_dicts, self.text_inf_dicts, self.tokenized_text, self.freq_tag_dict, self.stats = data
 
     def save_to_pickle(self, pickle_file):
         with open(pickle_file, 'wb') as handle:
-            data = self.raw_text, self.text_spans, self.tokenized_text, self.freq_tag_dict, self.stats
+            data = self.raw_text, self.text_spans, self.text_dicts, self.text_inf_dicts, self.tokenized_text, self.freq_tag_dict, self.stats
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def is_valid_word(self, word, tag):
@@ -202,16 +204,24 @@ class Corpus(QObject):
             words_tags = [(word, tag) for word, tag in tokens_tags if self.is_valid_word(word, tag)]
 
             words_tags.sort(reverse=True, key=lambda wt: wt[0])
+            self.text_dicts[text_name] = {}
             for word, tag in words_tags:
                 self.add_word(word, tag)
+                self.add_word(word, tag, text_name)
 
+            for text_name in self.text_dicts:
+                self.text_inf_dicts[text_name] = self.get_inf_dict(text_name)
             print('Done!')
 
         except Exception as e:
             print(e)
 
-    def get_words(self):
-        words = list(self.freq_tag_dict.keys())
+    def get_words(self, text_name=None):
+        d = self.freq_tag_dict
+        if text_name:
+            d = self.text_dicts[text_name]
+
+        words = list(d.keys())
         words.sort(key=lambda w: w.lower())
         modified = self.modified_words
         self.modified_words = set()
@@ -256,32 +266,38 @@ class Corpus(QObject):
         ]
         return "".join(context)
 
-    def add_word(self, word, tag):
+    def add_word(self, word, tag, text_name=None):
+        d = self.freq_tag_dict
+        if text_name:
+            d = self.text_dicts[text_name]
         self.refresh_stats = True
         self.modified_words.add(word)
         if word[0].isupper():
             lower_word = word.lower()
-            lower_val = self.freq_tag_dict.get(lower_word, [0, None])[0]
+            lower_val = d.get(lower_word, [0, None])[0]
             if lower_val > 0:
-                self.freq_tag_dict[lower_word][0] += 1
-                if self.freq_tag_dict[lower_word][1].get(tag) is None:
-                    init = self.get_init_form(lower_word, tag)
-                    self.freq_tag_dict[lower_word][1][tag] = init
+                d[lower_word][0] += 1
+                if d[lower_word][1].get(tag) is None:
+                    init = self.get_init_form(lower_word, tag, text_name)
+                    d[lower_word][1][tag] = init
                 return
-        val = self.freq_tag_dict.get(word, [0, None])[0]
+        val = d.get(word, [0, None])[0]
         if val > 0:
-            self.freq_tag_dict[word][0] += 1
-            if self.freq_tag_dict[word][1].get(tag) is None:
-                init = self.get_init_form(word, tag)
-                self.freq_tag_dict[word][1][tag] = init
+            d[word][0] += 1
+            if d[word][1].get(tag) is None:
+                init = self.get_init_form(word, tag, text_name)
+                d[word][1][tag] = init
         else:
-            init = self.get_init_form(word, tag)
-            self.freq_tag_dict[word] = [1, {tag: init}]
+            init = self.get_init_form(word, tag, text_name)
+            d[word] = [1, {tag: init}]
 
-    def add_tag(self, word, tag):
-        if self.freq_tag_dict[word][1].get(tag) is None:
-            init = self.get_init_form(word, tag)
-            self.freq_tag_dict[word][1][tag] = init
+    def add_tag(self, word, tag, text_name=None):
+        d = self.freq_tag_dict
+        if text_name:
+            d = self.text_dicts[text_name]
+        if d[word][1].get(tag) is None:
+            init = self.get_init_form(word, tag, text_name)
+            d[word][1][tag] = init
 
     def remove_tag(self, word, tag):
         del self.freq_tag_dict[word][1][tag]
@@ -401,11 +417,17 @@ class Corpus(QObject):
         end = start + len(word)
         return start - text_start, end - text_start
 
-    def get_freq(self, word):
-        return self.freq_tag_dict.get(word, (0, {}))[0]
+    def get_freq(self, word, text_name=None):
+        d = self.freq_tag_dict
+        if text_name:
+            d = self.text_dicts[text_name]
+        return d.get(word, (0, {}))[0]
 
-    def get_tags(self, word):
-        return self.freq_tag_dict.get(word, (0, {}))[1].keys()
+    def get_tags(self, word, text_name=None):
+        d = self.freq_tag_dict
+        if text_name:
+            d = self.text_dicts[text_name]
+        return d.get(word, (0, {}))[1].keys()
 
     @staticmethod
     def make_tag(word):
@@ -416,9 +438,12 @@ class Corpus(QObject):
             print(e)
         return tag
 
-    def get_init_form(self, word, tag):
-        if self.freq_tag_dict.get(word) is not None and self.freq_tag_dict[word][1].get(tag) is not None:
-            return self.freq_tag_dict[word][1][tag]
+    def get_init_form(self, word, tag, text_name=None):
+        d = self.freq_tag_dict
+        if text_name:
+            d = self.text_dicts[text_name]
+        if d.get(word) is not None and d[word][1].get(tag) is not None:
+            return d[word][1][tag]
         lemma = word
         try:
             lemmatizer = WordNetLemmatizer()
@@ -428,3 +453,43 @@ class Corpus(QObject):
         except Exception as e:
             print(e)
         return lemma
+
+    def get_inf_dict(self, text_name, threshold=1):
+        inf_words = [
+            word for word in self.get_words()[0]
+            if self.get_freq(word) > threshold
+        ]
+        d = self.text_dicts[text_name]
+        inf_d = {}
+        max_freq = 0
+        for word, (freq, _) in d.items():
+            if word in inf_words:
+                inf_d[word] = d[word][0]
+                if max_freq < freq:
+                    max_freq = freq
+        for word in inf_d:
+            inf_d[word] /= max_freq
+        return inf_d
+
+    def query(self, phrase):
+        tokens = self.tokenizer.tokenize(phrase)
+        tokens_tags = nltk.pos_tag(tokens)
+        keywords = []
+        for token, tag in tokens_tags:
+            if self.is_valid_word(token, tag):
+                # init = self.get_init_form(token, tag)
+                keywords.append(token)
+
+        relevant_texts = {}
+        for text_name in self.text_spans:
+            inf_d = self.text_inf_dicts[text_name]
+            p = 0
+            for word in inf_d:
+                if word in keywords:
+                    p += inf_d[word]
+
+            if p > 0:
+                relevant_texts[text_name] = p
+
+        return list(relevant_texts.keys()), relevant_texts
+

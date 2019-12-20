@@ -68,7 +68,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_dict">
      <attribute name="title">
@@ -467,15 +467,15 @@
      <attribute name="title">
       <string>Raw Text</string>
      </attribute>
-     <widget class="QTextBrowser" name="tb_raw">
+     <widget class="QTextEdit" name="tb_raw">
       <property name="enabled">
        <bool>false</bool>
       </property>
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>13</x>
         <y>10</y>
-        <width>541</width>
+        <width>581</width>
         <height>431</height>
        </rect>
       </property>

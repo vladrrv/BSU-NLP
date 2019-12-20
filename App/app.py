@@ -123,6 +123,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 
         self.set_legend()
+        self.keywords = None
 
         self.action_add.triggered.connect(self.open_dir)
         self.action_save.triggered.connect(self.save_corpus)
@@ -346,9 +347,10 @@ class MyApp(QMainWindow, Ui_MainWindow):
             return
 
         self.cur_text_name = selection[0].text()
-        raw_text = self.corpus.get_raw_text(self.cur_text_name)
+        raw_text = self.corpus.get_raw_text(self.cur_text_name, self.keywords)
         self.tb_raw.setEnabled(True)
-        self.tb_raw.setText(raw_text)
+        self.tb_raw.clear()
+        self.tb_raw.append(raw_text)
         self.action_annotate.setEnabled(True)
 
     def load_stats(self, tw, stats):
@@ -418,10 +420,14 @@ class MyApp(QMainWindow, Ui_MainWindow):
         relevant_texts = self.corpus.get_text_names()
         try:
             phrase = self.le_query.text()
+            self.keywords = None
+
             if phrase:
-                relevant_texts, _ = self.corpus.query(phrase)
+                relevant_texts_d, self.keywords = self.corpus.query(phrase)
+                relevant_texts = list(relevant_texts_d.keys())
+                relevant_texts.sort(key=lambda x: relevant_texts_d[x])
             self.lw_raw.clear()
-            self.lw_raw.addItems(list(relevant_texts))
+            self.lw_raw.addItems(relevant_texts)
         except Exception as e:
             print(e)
 

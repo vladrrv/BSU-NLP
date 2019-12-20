@@ -51,7 +51,7 @@ tag_descr = {
     'WP$': 'Possessive wh-pronoun',
     'WRB': 'Wh-adverb'
 }
-
+non_inf_tags = {'DT', 'CC'}
 tag_colormap = {
     'CC': 'MistyRose',
     'CD': 'MediumPurple',
@@ -227,10 +227,14 @@ class Corpus(QObject):
         self.modified_words = set()
         return words, modified
 
-    def find_index(self, word, num):
+    def find_index(self, word, num, text_name=None):
         count = 0
         wl = word.lower()
-        for i, (_, w, _) in enumerate(self.tokenized_text):
+        if text_name:
+            text_start, text_end = self.text_spans[text_name]
+        for i, (s, w, _) in enumerate(self.tokenized_text):
+            if text_name and (s < text_start or s >= text_end):
+                continue
             if w.lower() == wl:
                 if count == num:
                     return i
@@ -407,9 +411,26 @@ class Corpus(QObject):
     def get_text_names(self):
         return list(self.text_spans.keys())
 
-    def get_raw_text(self, text_name):
+    def get_raw_text(self, text_name, keywords=None):
         text_start, text_end = self.text_spans[text_name]
-        return self.raw_text[text_start:text_end]
+        raw_text = self.raw_text[text_start:text_end]
+        prev_end = text_start
+        if keywords:
+            new_text = []
+            count = 0
+            for keyword in keywords:
+                i = self.find_index(keyword, count, text_name)
+                word_start, word, tag = self.tokenized_text[i]
+                # count += 1
+                raw_span = self.html_span.format(self.raw_text[prev_end:word_start])
+                prev_end = word_start + len(word)
+                new_text.append(raw_span)
+                span = self.html_colored_span.format(get_color(tag), word)
+                new_text.append(span)
+            raw_span = self.html_span.format(self.raw_text[prev_end:])
+            new_text.append(raw_span)
+            raw_text = ''.join(new_text)
+        return raw_text
 
     def get_word_bounds(self, text_name, index):
         text_start, _ = self.text_spans[text_name]
@@ -476,7 +497,7 @@ class Corpus(QObject):
         tokens_tags = nltk.pos_tag(tokens)
         keywords = []
         for token, tag in tokens_tags:
-            if self.is_valid_word(token, tag):
+            if self.is_valid_word(token, tag) and tag not in non_inf_tags:
                 # init = self.get_init_form(token, tag)
                 keywords.append(token)
 
@@ -491,5 +512,5 @@ class Corpus(QObject):
             if p > 0:
                 relevant_texts[text_name] = p
 
-        return list(relevant_texts.keys()), relevant_texts
+        return relevant_texts, keywords
 

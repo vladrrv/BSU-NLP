@@ -620,7 +620,7 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>261</width>
+        <width>281</width>
         <height>211</height>
        </rect>
       </property>
@@ -659,10 +659,10 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
      <widget class="QTableWidget" name="tw_stat_wt">
       <property name="geometry">
        <rect>
-        <x>330</x>
-        <y>0</y>
-        <width>261</width>
-        <height>441</height>
+        <x>310</x>
+        <y>10</y>
+        <width>281</width>
+        <height>431</height>
        </rect>
       </property>
       <property name="editTriggers">
@@ -707,8 +707,8 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
        <rect>
         <x>10</x>
         <y>230</y>
-        <width>261</width>
-        <height>221</height>
+        <width>281</width>
+        <height>211</height>
        </rect>
       </property>
       <property name="editTriggers">

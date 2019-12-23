@@ -259,7 +259,7 @@ class Corpus(QObject):
         word_end = word_start + len(word)
         num_words = 20
         start_i = max(0, index-num_words)
-        end_i = min(len(self.tokenized_text), index+num_words)
+        end_i = min(len(self.tokenized_text)-1, index+num_words)
         context_start, _, _ = self.tokenized_text[start_i]
         context_end, _, _ = self.tokenized_text[end_i]
         context = [

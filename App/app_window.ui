@@ -68,7 +68,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_dict">
      <attribute name="title">
@@ -490,7 +490,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>301</width>
+        <width>321</width>
         <height>431</height>
        </rect>
       </property>
@@ -508,7 +508,7 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
      <widget class="QWidget" name="gridLayoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>340</x>
         <y>70</y>
         <width>261</width>
         <height>371</height>
@@ -519,8 +519,8 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
      <widget class="QWidget" name="verticalLayoutWidget_3">
       <property name="geometry">
        <rect>
-        <x>320</x>
-        <y>5</y>
+        <x>340</x>
+        <y>10</y>
         <width>261</width>
         <height>61</height>
        </rect>
@@ -620,8 +620,8 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>191</width>
-        <height>191</height>
+        <width>261</width>
+        <height>211</height>
        </rect>
       </property>
       <property name="editTriggers">
@@ -659,9 +659,9 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
      <widget class="QTableWidget" name="tw_stat_wt">
       <property name="geometry">
        <rect>
-        <x>210</x>
-        <y>10</y>
-        <width>231</width>
+        <x>330</x>
+        <y>0</y>
+        <width>261</width>
         <height>441</height>
        </rect>
       </property>
@@ -678,7 +678,7 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
        <enum>QAbstractItemView::ScrollPerPixel</enum>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>70</number>
+       <number>80</number>
       </attribute>
       <attribute name="horizontalHeaderMinimumSectionSize">
        <number>50</number>
@@ -706,9 +706,9 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>210</y>
-        <width>191</width>
-        <height>241</height>
+        <y>230</y>
+        <width>261</width>
+        <height>221</height>
        </rect>
       </property>
       <property name="editTriggers">
@@ -724,7 +724,7 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
        <enum>QAbstractItemView::ScrollPerPixel</enum>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>70</number>
+       <number>80</number>
       </attribute>
       <attribute name="horizontalHeaderMinimumSectionSize">
        <number>50</number>
@@ -832,7 +832,7 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
      <x>0</x>
      <y>0</y>
      <width>900</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

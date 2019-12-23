@@ -1,5 +1,4 @@
 import os
-import numpy as np
 import nltk
 from nltk.corpus.reader.plaintext import *
 import sys

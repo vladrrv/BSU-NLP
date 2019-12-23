@@ -1,4 +1,3 @@
-import numpy as np
 import re
 import pickle
 import string
@@ -7,7 +6,7 @@ from nltk.tokenize import *
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import wordnet
 
-from PyQt5.QtCore import *
+from PyQt5.QtCore import QObject, pyqtSignal
 
 # nltk.download('averaged_perceptron_tagger')
 # nltk.download('wordnet')
@@ -153,11 +152,13 @@ class Corpus(QObject):
     def load_from_pickle(self, pickle_file):
         with open(pickle_file, 'rb') as handle:
             data = pickle.load(handle)
-            self.raw_text, self.text_spans, self.text_dicts, self.text_inf_dicts, self.tokenized_text, self.freq_tag_dict, self.stats = data
+            (self.raw_text, self.text_spans, self.text_dicts, self.text_inf_dicts, self.tokenized_text,
+             self.freq_tag_dict, self.stats, self.refresh_stats) = data
 
     def save_to_pickle(self, pickle_file):
         with open(pickle_file, 'wb') as handle:
-            data = self.raw_text, self.text_spans, self.text_dicts, self.text_inf_dicts, self.tokenized_text, self.freq_tag_dict, self.stats
+            data = (self.raw_text, self.text_spans, self.text_dicts, self.text_inf_dicts, self.tokenized_text,
+                    self.freq_tag_dict, self.stats, self.refresh_stats)
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     def is_valid_word(self, word, tag):

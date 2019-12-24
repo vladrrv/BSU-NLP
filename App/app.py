@@ -65,7 +65,6 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.progress_bar: QProgressBar = self.progress_bar
         self.label_progress: QLabel = self.label_progress
 
-        self.pb_search: QPushButton = self.pb_search
         self.pb_edit: QPushButton = self.pb_edit
         self.le_search: QLineEdit = self.le_search
         self.le_editword: QLineEdit = self.le_editword
@@ -133,7 +132,6 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
         self.pb_query.clicked.connect(self.query)
 
-        self.pb_search.clicked.connect(self.search)
         self.pb_edit.clicked.connect(self.edit_word)
         self.le_search.returnPressed.connect(self.search)
         self.le_search.textChanged.connect(self.search)
@@ -199,7 +197,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
     def search(self):
         char_seq = self.le_search.text()
-        found, modified = self.corpus.get_words()
+        found, modified = self.corpus.get_words(reset_modified=False)
         if not (char_seq is None or char_seq == ''):
             reg = "^"+char_seq
             found = [word for word in found if re.match(reg, word) is not None]
@@ -245,10 +243,10 @@ class MyApp(QMainWindow, Ui_MainWindow):
     def edit_word(self):
         try:
             new = self.le_editword.text()
-            index = self.find_index(self.cur_word, self.cur_num)
+            index = self.corpus.find_index(self.cur_word, self.cur_num)
             self.corpus.replace_word(index, new)
-            words, modified = self.corpus.get_words()
-            self.load_words( words, modified)
+            words, modified = self.corpus.get_words(reset_modified=False)
+            self.load_words(words, modified)
             self.tb_context.setText('')
             self.le_editword.setText('')
             self.le_editword.setReadOnly(True)
@@ -333,6 +331,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.cur_tag_annot = None
         annotated_text = self.corpus.get_annotated_text(self.cur_text_name)
         self.te_annotated.clear()
+        self.te_annotated.setEnabled(True)
         self.te_annotated.append(annotated_text)
         self.tabs.setCurrentIndex(2)
 
@@ -343,6 +342,8 @@ class MyApp(QMainWindow, Ui_MainWindow):
             self.tb_raw.clear()
             self.tb_raw.setEnabled(False)
             self.action_annotate.setEnabled(False)
+            self.te_annotated.clear()
+            self.te_annotated.setEnabled(False)
             return
 
         self.cur_text_name = selection[0].text()

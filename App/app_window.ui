@@ -86,6 +86,11 @@
         <height>431</height>
        </rect>
       </property>
+      <property name="font">
+       <font>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
       <property name="title">
        <string>Word tools</string>
       </property>
@@ -100,6 +105,11 @@
          <width>181</width>
          <height>191</height>
         </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
        </property>
        <property name="title">
         <string>Tags</string>
@@ -123,7 +133,14 @@
             <number>2</number>
            </property>
            <item>
-            <widget class="QComboBox" name="cb_tags"/>
+            <widget class="QComboBox" name="cb_tags">
+             <property name="maximumSize">
+              <size>
+               <width>60</width>
+               <height>16777215</height>
+              </size>
+             </property>
+            </widget>
            </item>
            <item>
             <spacer name="horizontalSpacer">
@@ -253,6 +270,11 @@
          <height>191</height>
         </rect>
        </property>
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+        </font>
+       </property>
        <property name="title">
         <string>Context</string>
        </property>
@@ -288,6 +310,17 @@
            </item>
            <item>
             <widget class="QPushButton" name="pb_edit">
+             <property name="maximumSize">
+              <size>
+               <width>70</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>9</pointsize>
+              </font>
+             </property>
              <property name="text">
               <string>Edit</string>
              </property>
@@ -343,43 +376,19 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <property name="spacing">
-          <number>2</number>
+        <widget class="QLineEdit" name="le_search">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
          </property>
-         <item>
-          <widget class="QLineEdit" name="le_search">
-           <property name="font">
-            <font>
-             <pointsize>10</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="placeholderText">
-            <string>Type here to search</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="pb_search">
-           <property name="text">
-            <string>Search</string>
-           </property>
-           <property name="icon">
-            <iconset resource="App.qrc">
-             <normaloff>:/icon/24x24/84.png</normaloff>:/icon/24x24/84.png</iconset>
-           </property>
-           <property name="default">
-            <bool>true</bool>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="placeholderText">
+          <string>Type here to search</string>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QTableWidget" name="tw_wordfreq">
@@ -486,6 +495,9 @@
       <string>Annotated Text</string>
      </attribute>
      <widget class="QTextEdit" name="te_annotated">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -780,6 +792,11 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
       <height>481</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>Corpus Texts</string>
     </property>
@@ -788,7 +805,7 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
       <rect>
        <x>10</x>
        <y>20</y>
-       <width>231</width>
+       <width>241</width>
        <height>451</height>
       </rect>
      </property>
@@ -812,8 +829,21 @@ selection-background-color: rgba(0, 0, 0, 1);</string>
         </item>
         <item>
          <widget class="QPushButton" name="pb_query">
+          <property name="maximumSize">
+           <size>
+            <width>80</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="text">
            <string>Query</string>
+          </property>
+          <property name="icon">
+           <iconset resource="App.qrc">
+            <normaloff>:/icon/24x24/84.png</normaloff>:/icon/24x24/84.png</iconset>
+          </property>
+          <property name="default">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

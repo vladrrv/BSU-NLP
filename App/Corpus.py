@@ -144,6 +144,7 @@ class Corpus(QObject):
         self.freq_tag_dict = {}
         self.tokenizer = TreebankWordTokenizer()
         self.sent_tokenizer = PunktSentenceTokenizer()
+        self.lemmatizer = WordNetLemmatizer()
         self.stats = ({}, {}, {})
         self.refresh_stats = False
 
@@ -217,7 +218,7 @@ class Corpus(QObject):
         except Exception as e:
             print(e)
 
-    def get_words(self, text_name=None):
+    def get_words(self, text_name=None, reset_modified=True):
         d = self.freq_tag_dict
         if text_name:
             d = self.text_dicts[text_name]
@@ -225,7 +226,8 @@ class Corpus(QObject):
         words = list(d.keys())
         words.sort(key=lambda w: w.lower())
         modified = self.modified_words
-        self.modified_words = set()
+        if reset_modified:
+            self.modified_words = set()
         return words, modified
 
     def find_index(self, word, num, text_name=None):
@@ -418,16 +420,16 @@ class Corpus(QObject):
         prev_end = text_start
         if keywords:
             new_text = []
-            count = 0
-            for keyword in keywords:
-                i = self.find_index(keyword, count, text_name)
-                word_start, word, tag = self.tokenized_text[i]
-                # count += 1
-                raw_span = self.html_span.format(self.raw_text[prev_end:word_start])
-                prev_end = word_start + len(word)
-                new_text.append(raw_span)
-                span = self.html_colored_span.format(get_color(tag), word)
-                new_text.append(span)
+            for word_start, word, tag in self.tokenized_text:
+                if word_start < text_start or word_start >= text_end:
+                    continue
+                init_word = self.get_init_form(word, tag, text_name)
+                if word in keywords or word.lower() in keywords or init_word in keywords:
+                    raw_span = self.html_span.format(self.raw_text[prev_end:word_start])
+                    prev_end = word_start + len(word)
+                    new_text.append(raw_span)
+                    span = self.html_colored_span.format(get_color(tag), word)
+                    new_text.append(span)
             raw_span = self.html_span.format(self.raw_text[prev_end:])
             new_text.append(raw_span)
             raw_text = ''.join(new_text)
@@ -468,10 +470,9 @@ class Corpus(QObject):
             return d[word][1][tag]
         lemma = word
         try:
-            lemmatizer = WordNetLemmatizer()
             wtag = get_wordnet_pos(tag)
             if wtag != '':
-                lemma = lemmatizer.lemmatize(word, wtag)
+                lemma = self.lemmatizer.lemmatize(word, wtag)
         except Exception as e:
             print(e)
         return lemma

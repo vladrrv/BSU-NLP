@@ -479,7 +479,7 @@ class Corpus(QObject):
 
     def get_inf_dict(self, text_name, threshold=1):
         inf_words = [
-            word for word in self.get_words()[0]
+            word for word in self.get_words(reset_modified=False)[0]
             if self.get_freq(word) > threshold
         ]
         d = self.text_dicts[text_name]
